@@ -7,6 +7,7 @@ import websockets
 import requests
 import os
 
+# Hello :)
 app = FastAPI()
 
 STARTING_BANKROLL = float(os.getenv("STARTING_BANKROLL", "150"))
