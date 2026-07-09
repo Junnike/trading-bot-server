@@ -9,6 +9,13 @@ import os
 
 app = FastAPI()
 
+# ============ CONFIG (override via DO env vars if you want) ============
+STARTING_BANKROLL = float(os.getenv("STARTING_BANKROLL", "150"))
+BET_PERCENT = float(os.getenv("BET_PERCENT", "2"))
+MAX_BET_CAP = float(os.getenv("MAX_BET_CAP", "100"))
+LIMIT_PRICE = float(os.getenv("LIMIT_PRICE", "0.5"))
+RESOLVE_SECONDS = 15 * 60  # 15-min candle, matches the indicator
+
 # ============ STATE ============
 state = {
     "best_bid": None,
@@ -16,11 +23,19 @@ state = {
     "cvd": 0.0,
     "last_signal": None,
     "last_decision": None,
-    "trades": [],
+    "filtered": 0,
+    "bankroll": STARTING_BANKROLL,
     "wins": 0,
     "losses": 0,
-    "filtered": 0,
+    "net_profit": 0.0,
+    "trades": [],       # resolved trades, most recent first
+    "pending": [],       # trades waiting to resolve
 }
+
+def mid_price():
+    if state["best_bid"] is None or state["best_ask"] is None:
+        return None
+    return (state["best_bid"] + state["best_ask"]) / 2.0
 
 # ============ BINANCE WEBSOCKET (orderbook + trades) ============
 async def binance_orderbook_listener():
@@ -59,51 +74,24 @@ def orderbook_confirms(direction: str) -> bool:
         return True
     return False
 
-# ============ WEBHOOK FROM TRADINGVIEW ============
-@app.post("/tv-signal")
-async def tv_signal(request: Request):
-    payload = await request.json()
-    direction = payload.get("direction")
-    state["last_signal"] = {"direction": direction, "time": time.time()}
-
-    if orderbook_confirms(direction):
-        decision = "TRADE"
-    else:
-        decision = "FILTERED"
-        state["filtered"] += 1
-
-    state["last_decision"] = decision
-    state["trades"].append({
+# ============ TRADE RESOLUTION (bankroll compounding, same math as Pine) ============
+async def resolve_trade(direction: str, entry_price: float, signal_time: float):
+    pending_entry = {
         "direction": direction,
-        "decision": decision,
-        "cvd_at_signal": state["cvd"],
-        "time": time.time()
-    })
+        "entry_price": entry_price,
+        "signal_time": signal_time,
+        "resolve_time": signal_time + RESOLVE_SECONDS,
+    }
+    state["pending"].append(pending_entry)
 
-    notify_telegram(f"Signal: {direction} | Decision: {decision} | CVD: {state['cvd']:.1f}")
-    return {"status": "ok", "decision": decision}
+    await asyncio.sleep(RESOLVE_SECONDS)
 
-# ============ TELEGRAM NOTIFIER ============
-def notify_telegram(text: str):
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
+    exit_price = mid_price()
+    state["pending"] = [p for p in state["pending"] if p is not pending_entry]
+
+    if exit_price is None:
         return
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    requests.post(url, json={"chat_id": chat_id, "text": text})
 
-# ============ DASHBOARD ============
-@app.get("/", response_class=HTMLResponse)
-async def dashboard():
-    return f"""
-    <html><body style="background:#111;color:#eee;font-family:monospace;padding:20px">
-    <h2>Trading Bot Live Stats</h2>
-    <p>Best Bid: {state['best_bid']}</p>
-    <p>Best Ask: {state['best_ask']}</p>
-    <p>CVD: {state['cvd']:.1f}</p>
-    <p>Last Signal: {state['last_signal']}</p>
-    <p>Last Decision: {state['last_decision']}</p>
-    <p>Filtered: {state['filtered']}</p>
-    <p>Total Signals: {len(state['trades'])}</p>
-    </body></html>
-    """
+    won = (direction == "Up" and exit_price >= entry_price) or (direction == "Down" and exit_price < entry_price)
+
+    bet_amount = min(state["bankroll"] *
