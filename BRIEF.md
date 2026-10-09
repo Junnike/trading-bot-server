@@ -36,3 +36,6 @@ DEAD (do not retest): 1 bid under ask at 0.5-0.6; 2 buying by window age; 3 earl
 
 ## Output
 SERVER_RESULTS_09.10.2026.md, <= 80 lines: 1) confounders (months covered, gaps, Thursday exclusions, API shape changes); 2) one table per test with n/windows/months/value/z; 3) one verdict line per test; 4) best single cell with monthly signs; 5) BLOCKED/UNMEASURED list. Every number names its data file. Keep data/*.parquet aggregates (not raw prints).
+
+## Chat rule (added)
+At the end print the whole SERVER_RESULTS file in chat. Chat replies to Junn: Estonian, <=10 lines, no questions.
