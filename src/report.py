@@ -19,13 +19,15 @@ r=an_t15.run(["KXBTC15M"],"btc")
 cw=r["nwin"]
 A(f"Confounders: candles BTC {cw} windows, months {r['months'][0]}..{r['months'][-1]} (data/candle_parts); Thursday 07-09 UTC windows excluded; no-candle windows dropped; prints are a RANDOM SAMPLE of BTC last-60d windows (rate-limit bound).")
 t=r["t1b"];s=t[t.bidb=="[.7,.9)"].set_index("m")
-A(f"## T1b BTC yes_bid_close in [.7,.9): hit-bid by minute m (n windows) [data/candle_parts/KXBTC15M_*, markets_KXBTC15M.jsonl]")
-A("m: "+" ".join(f"{m}:{s.edge[m]*100:+.1f}c(n{int(s.n[m])})" for m in s.index if m<=14))
-mm=r["t1b_month"];mm=mm[mm.m>=5]
-pos=(mm.groupby("m").apply(lambda g:(g.edge>0).mean(),include_groups=False))
-best=s.loc[5:14].edge.idxmax()
-z=s.edge[best]/s.se[best]
-A(f"max edge at m>=5: m={best} {s.edge[best]*100:+.2f}c z={z:.1f}; months positive at that m: {pos.get(best,np.nan):.0%}. Verdict T1b: "+("ALIVE-candidate (see T6)" if (s.loc[5:14].edge>0.01).any() else "KILLED (hit-bid<=0.01 at every m>=5)"))
+A(f"## T1b BTC P(yes)-yes_bid_close, bucket [.7,.9) [data/candle_parts/KXBTC15M_*.parquet x markets_KXBTC15M.jsonl]")
+mmo=r["t1b_month"];mmo=mmo[mmo.n>=30]
+posm=mmo.groupby("m").apply(lambda g:pd.Series(dict(pos=(g.edge>0).mean(),k=len(g))),include_groups=False)
+A("m:edge c (n win, z, %months+): "+" ".join(f"{m}:{s.edge[m]*100:+.1f}(n{int(s.n[m])},z{s.edge[m]/s.se[m]:.1f},{posm.pos.get(m,np.nan):.0%})" for m in s.index if 5<=m<=14))
+oth=t[(t.m==7)&(t.bidb!="[.7,.9)")]
+A("m=7 other buckets hit-bid c: "+" ".join(f"{b}:{e*100:+.1f}" for b,e in zip(oth.bidb,oth.edge)))
+best=s.loc[5:14].edge.idxmax();bm=s.loc[5:13].edge.sub(0).idxmax()
+z7=s.edge[7]/s.se[7]
+A(f"T1b CAVEAT: edge assumes fill at the bid_close; no queue/adverse-selection model (use T1 print-level fills). Verdict T1b: "+("ALIVE" if (s.loc[5:14].edge>0.01).any() else "KILLED")+f" (hit-bid>0.01 at m=5-11; best m=7 {s.edge[7]*100:+.1f}c z={z7:.1f}, {posm.pos[7]:.0%} of {int(posm.k[7])} months positive -> T6 pass)")
 t5=r["t5"];ev=t5[t5.n>=500]
 tp=ev.sort_values("z",ascending=False).head(3)
 A(f"## T5 taker at real ask (pooled yes@ask/no@1-bid), EV c/ct after fee [data/candle_parts/KXBTC15M_*]")
@@ -39,6 +41,16 @@ if len(cand):
     for x in cand.sort_values("z",ascending=False).head(2).itertuples():
         mm_=r["t5_month"][(r["t5_month"].pb==x.pb)&(r["t5_month"].m==x.m)]
         A(f"T6 cell {x.pb} m={x.m}: monthly EV c/ct "+" ".join(f"{a}:{b*100:+.1f}(n{int(n)})" for a,b,n in zip(mm_.month,mm_["mean"],mm_["size"]))+" [positive months "+f"{(mm_['mean']>0).mean():.0%}, months={len(mm_)}]")
+for S2 in ("KXETH15M","KXSOL15M"):
+    if not glob.glob(D+f"candle_parts/{S2}_*.parquet"): continue
+    try: r2=an_t15.run([S2],"x")
+    except Exception as e: continue
+    if r2["nwin"]<300: continue
+    t2b=r2["t1b"];s2=t2b[t2b.bidb=="[.7,.9)"].set_index("m")
+    mo2=r2["t1b_month"];mo2=mo2[(mo2.n>=30)]
+    p2=mo2.groupby("m").apply(lambda g:pd.Series(dict(pos=(g.edge>0).mean(),k=len(g))),include_groups=False)
+    ev2=r2["t5"][r2["t5"].n>=500]
+    A(f"{S2[2:-3]} (candles only, {r2['nwin']} windows {r2['months'][0]}..{r2['months'][-1]}, data/candle_parts/{S2}_*): T1b [.7,.9) hit-bid c m5-9: "+" ".join(f"{m}:{s2.edge[m]*100:+.1f}(z{s2.edge[m]/s2.se[m]:.1f},{p2.pos.get(m,np.nan):.0%}of{int(p2.k.get(m,0))}mo)" for m in range(5,10) if m in s2.index)+f"; T5 max z (n>=500)={ev2.z.max():.1f}, cells z>2: {(ev2.z>2).sum()}/{len(ev2)}; flips {r2['flips']}/{r2['flip_den']}")
 A(f"Flips (ask_close m14 >=.9 & no / <=.1 & yes): {r['flips']} of {r['flip_den']} windows ({r['flips']/max(1,r['flip_den'])*100:.1f}%) [candles]")
 # T1
 if nw>=5:
