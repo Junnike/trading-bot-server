@@ -1,0 +1,1 @@
+BLOCKED: no outbound network in the sandbox; Junn must enable network access in the cloud environment settings (09.10.2026 10:45 UTC: proxy 403 on api.elections.kalshi.com after 2/4/8/16 s retries; data.binance.vision, gamma-api.polymarket.com, docs.polymarket.com, example.com also unreachable)
