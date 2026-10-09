@@ -44,6 +44,7 @@ def get(path, params=None, session=None):
             continue
         if r.status_code==429:
             open('/home/user/trading-bot-server/data/429.log','a').write(f'{time.time()} {path}\n'); time.sleep(10); continue
+        open('/home/user/trading-bot-server/data/req.log','a').write(f'{time.time():.1f} {r.status_code}\n')
         if r.status_code==200:
             _ok[0]+=1
             try: return r.json()
