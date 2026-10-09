@@ -16,4 +16,7 @@ if [ ! -f requirements.txt ]; then
   exit 0
 fi
 
-python3 -m pip install --quiet --disable-pip-version-check -r requirements.txt
+# Never block the session if the package index is unreachable.
+if ! python3 -m pip install --quiet --disable-pip-version-check -r requirements.txt; then
+  echo "session-start: pip install failed (package index unreachable?) - continuing" >&2
+fi
