@@ -39,10 +39,28 @@ out = {"days": [days[0], days[-1], len(days)], "markets": int(len(mk))}
 def prep(d):
     tr = load_day(d)
     tr = tr.merge(mk[["cid", "start", "up"]], on="cid"); tr["age"] = tr.ts - tr.start
-    tr["cid"] = tr.cid.str[:12]
+    tr["cid"] = tr.start
     return tr
+levels = np.round(np.arange(0.05, 0.951, 0.05), 2)
+CFG = [(c, r) for c in (300, 240) for r in (None, 2, 3, 5)]
+RES = {k: [] for k in CFG}
+def t8day(tr):
+    for cut, rule in CFG:
+        for cid, g in tr[tr.age <= cut].groupby("start"):
+            up = g.up.iat[0]; u = g.u.values; mv = g.mv.values
+            ok_up = np.ones(len(g), bool) if rule is None else (np.minimum.accumulate(mv) > -rule)
+            ok_dn = np.ones(len(g), bool) if rule is None else (np.maximum.accumulate(mv) < rule)
+            pnl = 0.0; r = 0.0; nf = 0
+            if ok_up.any():
+                mn = np.min(np.where(ok_up, u, 9))
+                for L in levels[levels > mn]:
+                    pnl += up - L; r += 0.2 * fee(L); nf += 1
+            if ok_dn.any():
+                mx = np.max(np.where(ok_dn, u, -9))
+                for L in levels[levels > 1 - mx]:
+                    pnl += (1 - up) - L; r += 0.2 * fee(L); nf += 1
+            RES[(cut, rule)].append((cid, pnl, r, nf))
 fs = []
-T8IN = []
 for d in days:
     tr = prep(d)
     f = tr[(tr.side == "BUY") & (tr.age >= 0) & (tr.age <= 30)].copy()
@@ -56,12 +74,13 @@ for d in days:
     f["win"] = (f.oi == (1 - f.up)).astype(float)   # outcome 0 = Up
     f["fee"] = fee(f.price); f["edge"] = f.fair - f.price - f.fee; f["pnl"] = f.win - f.price - f.fee
     f = f[(f.price > 0.01) & (f.price < 0.99)]
+    f = f.drop(columns=['side','pw']).astype({'oi':'int8','up':'int8','price':'float32','size':'float32','fair':'float32','win':'float32','fee':'float32','edge':'float32','pnl':'float32','age':'int16'})
     fs.append(f)
     tr = tr[(tr.age >= 0) & (tr.age <= 300)].copy()
     tr['u'] = np.where(tr.oi == 0, tr.price, 1 - tr.price)
     ts_ = tr.ts.values; st_ = tr.start.values
     tr['mv'] = (px[ts_ - LAT - t0] / px[st_ - t0] - 1) * 1e4
-    T8IN.append(tr[['age','up','u','mv','start']].astype({'age':'int16','up':'int8','u':'float32','mv':'float32'})); del tr
+    t8day(tr[['age','up','u','mv','start']]); del tr
 f = pd.concat(fs, ignore_index=True)
 rows = []
 def row(name, g):
@@ -76,31 +95,22 @@ for th in [0.0, 0.02, 0.05]:
     row(f"model edge>{th} (0-30)", f[f.edge > th])
     row(f"model edge>{th} (9-22)", f[(f.edge > th) & (f.age >= 9) & (f.age < 22)])
 out["T3"] = rows
-f.assign(month=pd.to_datetime(f.ts, unit="s").dt.strftime("%Y-%m")).groupby("month").apply(lambda g: pd.Series(dict(n=len(g), ev_c=np.average(g.pnl, weights=g["size"]) * 100))).to_csv(f"{D}/T3_monthly_{tag}.csv")
+mrows = []
+f["month"] = pd.to_datetime(f.ts, unit="s").dt.strftime("%Y-%m")
+for nm, g in [("all 0-30", f), ("edge>0.05 0-30", f[f.edge > 0.05]), ("edge>0.05 9-22", f[(f.edge > 0.05) & (f.age >= 9) & (f.age < 22)]), ("edge>0 0-30", f[f.edge > 0])]:
+    for mo, h in g.groupby("month"):
+        mrows.append(dict(cell=nm, month=mo, n=len(h), windows=h.cid.nunique(), ev_c=round(np.average(h.pnl, weights=h["size"]) * 100, 2)))
+pd.DataFrame(mrows).to_csv(f"{D}/T3_monthly_{tag}.csv", index=False)
 pd.DataFrame(rows).to_csv(f"{D}/T3_{tag}.csv", index=False)
-tr = pd.concat(T8IN, ignore_index=True); del T8IN
-levels = np.round(np.arange(0.05, 0.951, 0.05), 2)
 res = []
-for cut, rule in [(c, r) for c in (300, 240) for r in (None, 2, 3, 5)]:
-    tot = 0.0; reb = 0.0; nf = 0; per = []; dk = []
-    for cid, g in tr[tr.age <= cut].groupby("start"):
-        up = g.up.iat[0]
-        u = g.u.values; mv = g.mv.values
-        # Up bids at L fill when u < L (and not pulled: Up bids pulled once mv <= -rule); Down bids at L fill when u > 1-L (pulled once mv >= rule)
-        ok_up = np.ones(len(g), bool) if rule is None else (np.minimum.accumulate(mv) > -rule)
-        ok_dn = np.ones(len(g), bool) if rule is None else (np.maximum.accumulate(mv) < rule)
-        pnl = 0.0; r = 0.0
-        if ok_up.any():
-            mn = np.min(np.where(ok_up, u, 9))             # lowest print before pull; bids at L > mn fill
-            for L in levels[levels > mn]:
-                idx = np.argmax(ok_up & (u < L)); pnl += up - L; r += 0.2 * fee(L); nf += 1
-        if ok_dn.any():
-            mx = np.max(np.where(ok_dn, u, -9))
-            for L in levels[levels > 1 - mx]:
-                pnl += (1 - up) - L; r += 0.2 * fee(L); nf += 1
-        per.append((pnl, r)); dk.append((g.start.iat[0] // 86400, pnl + r))
-    a = np.array(per); nd = len(days)
-    dd = pd.DataFrame(dk).groupby(0)[1].sum(); res.append(dict(cutoff_s=cut, rule="none" if rule is None else f"{rule}bp", days_pos=f"{(dd>0).sum()}/{len(dd)}", fills=nf, markets=len(a), pnl_usd_day=round(a[:, 0].sum() / nd, 2), rebate_usd_day=round(a[:, 1].sum() / nd, 2), net_usd_day=round(a.sum() / nd, 2), z=round(a.sum(1).mean() / (a.sum(1).std() / np.sqrt(len(a))), 2)))
+nd = len(days)
+for (cut, rule), lst in RES.items():
+    A = np.array(lst); per = A[:, 1:3]; nf = int(A[:, 3].sum())
+    dd = pd.Series(per.sum(1)).groupby(A[:, 0] // 86400).sum()
+    a = per
+    res.append(dict(cutoff_s=cut, rule="none" if rule is None else f"{rule}bp", days_pos=f"{(dd>0).sum()}/{len(dd)}", fills=nf, markets=len(a), pnl_usd_day=round(a[:, 0].sum() / nd, 2), rebate_usd_day=round(a[:, 1].sum() / nd, 2), net_usd_day=round(a.sum() / nd, 2), z=round(a.sum(1).mean() / (a.sum(1).std() / np.sqrt(len(a))), 2)))
+    mo = pd.Series(per.sum(1)).groupby(pd.to_datetime(A[:, 0], unit="s").strftime("%Y-%m")).sum()
+    res[-1]["months_pos"] = f"{(mo>0).sum()}/{len(mo)}"
 out["T8"] = res
 pd.DataFrame(res).to_csv(f"{D}/T8_{tag}.csv", index=False)
 json.dump(out, open(f"{D}/T3T8_{tag}.json", "w"), indent=1, default=str)

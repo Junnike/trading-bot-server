@@ -22,6 +22,8 @@ def candles(S):
     fs=sorted(glob.glob(D+f"candle_parts/{S}_*.parquet"))
     if not fs: return pd.DataFrame()
     c=pd.concat([pd.read_parquet(f) for f in fs],ignore_index=True)
+    for k in c.columns:
+        if k!='ticker': c[k]=pd.to_numeric(c[k],errors='coerce')
     return c
 def candle_wide(S,mk):
     """per-ticker x minute(1..15) arrays"""

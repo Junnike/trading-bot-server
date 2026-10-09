@@ -23,12 +23,18 @@ def events(slugs):
                             vol=m.get("volumeNum"), fee=json.dumps(m.get("feeSchedule")), feesEnabled=m.get("feesEnabled")))
     return out
 def trades(cid):
-    rows, off = [], 0
+    rows, off, end = [], 0, None
     while True:
-        d = get("https://data-api.polymarket.com/trades", dict(market=cid, limit=1000, offset=off))
+        prm = dict(market=cid, limit=1000, offset=off)
+        if end is not None: prm["end"] = end
+        d = get("https://data-api.polymarket.com/trades", prm)
         rows += d
         if len(d) < 1000: break
         off += 1000
+        if off > 10000:   # API max offset 10000: restart window at oldest timestamp seen
+            mn = min(r["timestamp"] for r in d)
+            end = mn - 1 if (end is not None and mn == end) else mn
+            off = 0
     return [(cid, r["outcomeIndex"], r["side"], r["price"], r["size"], r["timestamp"], r["transactionHash"], r["proxyWallet"]) for r in rows]
 import sys
 day = dt.date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else dt.date(2026, 10, 9)
@@ -46,7 +52,7 @@ while day >= dt.date(2026, 2, 1):
         tr = [t for b in ex.map(lambda m: trades(m["cid"]), ms) for t in b]
     tdf = pd.DataFrame(tr, columns=["cid","oi","side","price","size","ts","tx","wallet"]).drop_duplicates(["tx","cid","oi","side","price","size","ts","wallet"])
     pd.DataFrame(ms).to_parquet(fn + "_markets.parquet")
-    tdf.to_parquet(fn + "_trades.parquet.tmp"); os.rename(fn + "_trades.parquet.tmp", fn + "_trades.parquet")
+    tdf.to_parquet(fn + "_trades.parquet.%d.tmp" % os.getpid()); os.replace(fn + "_trades.parquet.%d.tmp" % os.getpid(), fn + "_trades.parquet")
     print(day, len(ms), len(tdf), flush=True)
     day -= dt.timedelta(days=1)
 print("DONE", flush=True)

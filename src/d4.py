@@ -16,8 +16,9 @@ for f in glob.glob(f"data/candle_parts/{S}_*.parquet"):
     doneset|=set(pd.read_parquet(f,columns=["ticker"]).ticker)
 todo=[m for m in ms if m["ticker"] not in doneset]
 print(S,"todo",len(todo),flush=True)
-def f(x,k): 
-    v=x.get(k) if x else None
+def f(x,k):
+    if not x: return None
+    v=x.get(k+"_dollars") if (k+"_dollars") in x else x.get(k)
     return float(v) if v not in (None,"") else None
 def work(m):
     T=m["ticker"];o=int(pd.Timestamp(m["open_time"]).timestamp());c=int(pd.Timestamp(m["close_time"]).timestamp())
@@ -30,10 +31,10 @@ def work(m):
         if r.get("candlesticks"): cs=r["candlesticks"];break
     rows=[]
     for x in cs or []:
-        row={"ticker":T,"end_ts":x["end_period_ts"],"vol":f(x,"volume_fp"),"oi":f(x,"open_interest_fp")}
+        row={"ticker":T,"end_ts":x["end_period_ts"],"vol":f(x,"volume_fp") if "volume_fp" in x else f(x,"volume"),"oi":f(x,"open_interest_fp") if "open_interest_fp" in x else f(x,"open_interest")}
         for side in("yes_bid","yes_ask","price"):
             for k in("open","high","low","close"):
-                row[f"{side}_{k}"]=f(x.get(side),k+"_dollars")
+                row[f"{side}_{k}"]=f(x.get(side),k)
         rows.append(row)
     if not rows: rows=[{"ticker":T,"end_ts":None}]   # marker: no data
     return rows
