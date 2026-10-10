@@ -39,3 +39,6 @@ SERVER_RESULTS_09.10.2026.md, <= 80 lines: 1) confounders (months covered, gaps,
 
 ## Chat rule (added)
 At the end print the whole SERVER_RESULTS file in chat. Chat replies to Junn: Estonian, <=10 lines, no questions.
+
+## Accessibility rule (Junn has one hand, one finger)
+Minimise clicks, copying and typing for Junn. Never ask him to select/copy text or navigate folders. Deliver results as ONE big "copy all" button page (Artifact) or an attached file; keep chat replies short and simple. Do the work yourself whenever possible.
