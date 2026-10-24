@@ -1,0 +1,72 @@
+# 5m row counts vs expected (288/day)
+
+Months checked: 789; months with missing bars: 64; total missing 5m bars: 16031
+
+First-month partial listings (symbol listed mid-month) are included below.
+
+| market   | sym      | month   |   rows |   expected |   missing |
+|:---------|:---------|:--------|-------:|-----------:|----------:|
+| spot     | BTCUSDT  | 2020-02 |   8270 |       8352 |        82 |
+| spot     | BTCUSDT  | 2020-03 |   8903 |       8928 |        25 |
+| spot     | BTCUSDT  | 2020-04 |   8610 |       8640 |        30 |
+| spot     | BTCUSDT  | 2020-06 |   8598 |       8640 |        42 |
+| spot     | BTCUSDT  | 2020-11 |   8628 |       8640 |        12 |
+| spot     | BTCUSDT  | 2020-12 |   8870 |       8928 |        58 |
+| spot     | BTCUSDT  | 2021-02 |   8049 |       8064 |        15 |
+| spot     | BTCUSDT  | 2021-03 |   8910 |       8928 |        18 |
+| spot     | BTCUSDT  | 2021-04 |   8554 |       8640 |        86 |
+| spot     | BTCUSDT  | 2021-08 |   8874 |       8928 |        54 |
+| spot     | BTCUSDT  | 2021-09 |   8616 |       8640 |        24 |
+| spot     | BTCUSDT  | 2023-03 |   8912 |       8928 |        16 |
+| spot     | ETHUSDT  | 2020-02 |   8270 |       8352 |        82 |
+| spot     | ETHUSDT  | 2020-03 |   8903 |       8928 |        25 |
+| spot     | ETHUSDT  | 2020-04 |   8610 |       8640 |        30 |
+| spot     | ETHUSDT  | 2020-06 |   8598 |       8640 |        42 |
+| spot     | ETHUSDT  | 2020-11 |   8628 |       8640 |        12 |
+| spot     | ETHUSDT  | 2020-12 |   8870 |       8928 |        58 |
+| spot     | ETHUSDT  | 2021-02 |   8049 |       8064 |        15 |
+| spot     | ETHUSDT  | 2021-03 |   8910 |       8928 |        18 |
+| spot     | ETHUSDT  | 2021-04 |   8554 |       8640 |        86 |
+| spot     | ETHUSDT  | 2021-08 |   8874 |       8928 |        54 |
+| spot     | ETHUSDT  | 2021-09 |   8616 |       8640 |        24 |
+| spot     | ETHUSDT  | 2023-03 |   8912 |       8928 |        16 |
+| spot     | SOLUSDT  | 2020-08 |   5976 |       8928 |      2952 |
+| spot     | SOLUSDT  | 2020-11 |   8628 |       8640 |        12 |
+| spot     | SOLUSDT  | 2020-12 |   8870 |       8928 |        58 |
+| spot     | SOLUSDT  | 2021-02 |   8049 |       8064 |        15 |
+| spot     | SOLUSDT  | 2021-03 |   8910 |       8928 |        18 |
+| spot     | SOLUSDT  | 2021-04 |   8554 |       8640 |        86 |
+| spot     | SOLUSDT  | 2021-08 |   8874 |       8928 |        54 |
+| spot     | SOLUSDT  | 2021-09 |   8616 |       8640 |        24 |
+| spot     | SOLUSDT  | 2023-03 |   8912 |       8928 |        16 |
+| perp     | SOLUSDT  | 2020-09 |   4812 |       8640 |      3828 |
+| perp     | SOLUSDT  | 2022-02 |   7200 |       8064 |       864 |
+| perp     | SOLUSDT  | 2022-04 |   8064 |       8640 |       576 |
+| spot     | XRPUSDT  | 2020-02 |   8270 |       8352 |        82 |
+| spot     | XRPUSDT  | 2020-03 |   8903 |       8928 |        25 |
+| spot     | XRPUSDT  | 2020-04 |   8610 |       8640 |        30 |
+| spot     | XRPUSDT  | 2020-06 |   8598 |       8640 |        42 |
+| spot     | XRPUSDT  | 2020-11 |   8628 |       8640 |        12 |
+| spot     | XRPUSDT  | 2020-12 |   8870 |       8928 |        58 |
+| spot     | XRPUSDT  | 2021-02 |   8049 |       8064 |        15 |
+| spot     | XRPUSDT  | 2021-03 |   8910 |       8928 |        18 |
+| spot     | XRPUSDT  | 2021-04 |   8554 |       8640 |        86 |
+| spot     | XRPUSDT  | 2021-08 |   8874 |       8928 |        54 |
+| spot     | XRPUSDT  | 2021-09 |   8616 |       8640 |        24 |
+| spot     | XRPUSDT  | 2023-03 |   8912 |       8928 |        16 |
+| perp     | XRPUSDT  | 2020-01 |   7388 |       8928 |      1540 |
+| perp     | XRPUSDT  | 2022-02 |   7200 |       8064 |       864 |
+| perp     | XRPUSDT  | 2022-04 |   8064 |       8640 |       576 |
+| spot     | DOGEUSDT | 2020-02 |   8270 |       8352 |        82 |
+| spot     | DOGEUSDT | 2020-03 |   8903 |       8928 |        25 |
+| spot     | DOGEUSDT | 2020-04 |   8610 |       8640 |        30 |
+| spot     | DOGEUSDT | 2020-06 |   8598 |       8640 |        42 |
+| spot     | DOGEUSDT | 2020-11 |   8628 |       8640 |        12 |
+| spot     | DOGEUSDT | 2020-12 |   8870 |       8928 |        58 |
+| spot     | DOGEUSDT | 2021-02 |   8049 |       8064 |        15 |
+| spot     | DOGEUSDT | 2021-03 |   8910 |       8928 |        18 |
+| spot     | DOGEUSDT | 2021-04 |   8554 |       8640 |        86 |
+| spot     | DOGEUSDT | 2021-08 |   8874 |       8928 |        54 |
+| spot     | DOGEUSDT | 2021-09 |   8616 |       8640 |        24 |
+| spot     | DOGEUSDT | 2023-03 |   8912 |       8928 |        16 |
+| perp     | DOGEUSDT | 2020-07 |   6228 |       8928 |      2700 |
