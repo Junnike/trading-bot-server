@@ -16,8 +16,8 @@ for i,c in enumerate(cands):
     f=D+'raw/'+c['addr']+'.json.gz'
     if os.path.exists(f): continue
     a=c['addr']; port=post({'type':'portfolio','user':a})
-    fills=[]; st=0
-    for page in range(30):
+    fills=[]; st=int((time.time()-45*86400)*1000)
+    for page in range(15):
         r=post({'type':'userFillsByTime','user':a,'startTime':st,'aggregateByTime':False})
         if not r: break
         fills+=r

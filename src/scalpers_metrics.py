@@ -88,7 +88,8 @@ def copy_sim(fills,lt,shift_ms):
 
 def analyze(path):
     d=json.load(gzip.open(path,'rt')); a=d['addr']
-    fills=sorted([f for f in d['fills'] if is_perp(f['coin'])],key=lambda f:f['time'])
+    import time as _t; cut=(_t.time()-45*86400)*1000
+    fills=sorted([f for f in d['fills'] if is_perp(f['coin']) and f['time']>=cut],key=lambda f:f['time'])
     if len(fills)<200: return dict(addr=a,skip='few_fills',n=len(fills))
     t0,t1=fills[0]['time'],fills[-1]['time']; days=max((t1-t0)/86400e3,1e-3)
     lt=lots(fills)
