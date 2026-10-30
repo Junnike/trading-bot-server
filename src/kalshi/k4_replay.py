@@ -13,7 +13,7 @@ for l in open("data/kalshi/trades.jsonl"):
     m7 = [c for c in r["cs"] if c["e"] == o + 7 * 60][0]; bid = m7["bid"]; ask = m7["ask"]
     tr = pd.DataFrame(x["tr"])
     if len(tr):
-        tr["s"] = (pd.to_datetime(tr.ts, utc=True) - pd.Timestamp(o, unit="s", tz="UTC")).dt.total_seconds()
+        tr["s"] = (pd.to_datetime(tr.ts, utc=True, format="ISO8601") - pd.Timestamp(o, unit="s", tz="UTC")).dt.total_seconds()
         w = tr[(tr.s > 7 * 60 + 2) & (tr.s <= 8 * 60)]
     else: w = tr
     fillA = bool(len(w) and (w.p <= bid + 1e-9).any()); fillB = bool(len(w) and (w.p < bid - 1e-9).any())
