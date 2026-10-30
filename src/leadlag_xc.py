@@ -6,7 +6,7 @@ rng=np.random.default_rng(1)
 c,v,h,l=load(); idx=c.index
 L=np.log(c.astype('float64')); R=L.diff(); R[v==0]=np.nan   # stale (zero-volume) bar returns dropped
 REG=regimes(idx)
-alts=[s for s in c.columns if s not in EQ+CM+MAJ and s not in ('XAUT',)]
+alts=[s for s in c.columns if s not in EQ+CM+MAJ and s not in ('XAUT','MKR','TON')]
 print('alts',len(alts),alts)
 ALT=R[alts].mean(axis=1,skipna=True)          # equal-weight alt basket return
 R['ALT']=ALT
