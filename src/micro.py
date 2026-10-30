@@ -49,7 +49,7 @@ def nonoverlap(idx, hold):
     return np.array(keep, int)
 def run(px, cond, side, hold):
     """px: DataFrame with open, close on 5m grid (contiguity checked); cond: bool array aligned to px; enter next open, exit close after hold bars"""
-    ts = px.index.asi8 // 60_000; contig = np.r_[False, np.diff(ts) == 5]
+    ts = px.index.as_unit("ms").asi8 // 60_000; contig = np.r_[False, np.diff(ts) == 5]
     idx = np.where(cond)[0]; idx = idx[idx + hold < len(px)]
     ok = np.ones(len(idx), bool)
     for k in range(1, hold + 1): ok &= contig[idx + k]
