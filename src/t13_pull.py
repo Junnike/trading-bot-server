@@ -9,7 +9,7 @@ OUT="data/t13/tape.jsonl"
 def cells():
     mk=markets(['KXBTC15M']);mk=mk[~mk.thu_maint]
     c=candle_wide('KXBTC15M',mk)
-    s=c[(c.m==7)&(c.yes_bid_close>=.7)&(c.yes_bid_close<.9)].merge(mk[["ticker","close_ts"]],on="ticker")
+    s=c[(c.m==7)&(c.yes_bid_close>=.7)&(c.yes_bid_close<.9)].merge(mk[["ticker","close_ts","yes","month"]],on="ticker")
     return s
 def fetch(ep,T,S):
     rows=[];cur=None
