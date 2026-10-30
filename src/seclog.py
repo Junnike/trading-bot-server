@@ -28,5 +28,5 @@ while True:
             f = gzip.open(os.path.join(OUT, f"mids_{hour}.jsonl.gz"), "at"); cur = hour
         f.write(json.dumps(row, separators=(",", ":")) + "\n"); f.flush()
     except Exception as e:
-        sys.stderr.write(f"{time.time()} err {e}\n"); time.sleep(2)
+        sys.stderr.write(f"{time.time()} err {e}\n"); time.sleep(10 if "429" in str(e) else 2)
     time.sleep(max(0.0, 1.0 - (time.time() - t0)))
