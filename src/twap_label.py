@@ -14,7 +14,7 @@ def rz(p):
 def load1m(sym):
     c = f"{CACHE}/spot1m_{sym}.pkl"
     if os.path.exists(c): return pd.read_pickle(c)
-    d = pd.concat([rz(p) for p in sorted(glob.glob(f"{ROOT}/spot1m/{sym}/*.zip"))]); t = d.t.astype("int64").values; t = np.where(t > 10**14, t // 1000, t)
+    d = pd.concat([rz(p) for p in sorted(glob.glob(f"{ROOT}/spot1m/{sym}/*.zip")) + sorted(glob.glob(f"{ROOT}/spot1m_daily/{sym}/*.zip"))]); t = d.t.astype("int64").values; t = np.where(t > 10**14, t // 1000, t)
     d["t"] = pd.to_datetime(t, unit="ms", utc=True); d = d.drop_duplicates("t").set_index("t").sort_index().astype(float)
     d["vwap"] = (d.qv / d.v).where(d.v > 0, d.c); d.to_pickle(c); return d
 md = ["# T17 — CRSI robot scored on the venue TWAP label (03.11.2026)\n"]
