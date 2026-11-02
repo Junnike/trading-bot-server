@@ -25,17 +25,14 @@ for j in range(Nn):
         z0 = zz[i, j]
         if np.isnan(z0) or abs(z0) < 2 or np.isnan(bz[i, j]): i += 1; continue
         side = -np.sign(z0)   # z>0: perp rich -> short perp long spot (profit when basis falls) => pnl = -(b_exit-b_entry); funding received if rate>0
-        k = i + 1; fund = 0.0
-        while k < min(i + 24, T - 1) and not (abs(zz[k, j]) <= 0.5 if not np.isnan(zz[k, j]) else False):
-            fund += fv[k, j] * side * -1 * -1 if False else 0; k += 1
-        # funding: short perp (side=-1) receives +rate at settlements inside (i,k]; long perp pays
-        fund = -side * np.nansum(fv[i + 1:k + 1, j]) * -1
+        k = i + 1
+        while k < min(i + 24, T - 1) and not (abs(zz[k, j]) <= 0.5 if not np.isnan(zz[k, j]) else False): k += 1
         if np.isnan(bz[k, j]): i = k + 1; continue
-        gross = side * (bz[k, j] - bz[i, j]) * 1e4
-        rows.append((B.index[i], B.index[i].year, gross, (-side) * np.nansum(fv[i + 1:k + 1, j]) * 1e4 * -1 * -1 if False else side * -1 * np.nansum(fv[i + 1:k + 1, j]) * 1e4 * -1, k - i))
+        gross = side * (bz[k, j] - bz[i, j]) * 1e4          # side=-1: short perp/long spot profits when basis falls
+        fund = (-side) * np.nansum(fv[i + 1:k + 1, j]) * 1e4  # short perp receives positive funding
+        rows.append((B.index[i], B.index[i].year, gross, fund, k - i))
         i = k + 1
 D = pd.DataFrame(rows, columns=["t", "year", "gross", "fund", "hold"])
-D["fund"] = D["fund"]  # sign: side=-1 (short perp) receives positive funding -> computed above as (+rate)
 for y, g in list(D.groupby("year")) + [("ALL", D)]:
     tot = g.gross + g.fund
     md.append(f"| {y} | {len(g)} | {g.gross.mean():+.1f} | {g.fund.mean():+.1f} | {(tot - 8).mean():+.1f} | {(tot - 20).mean():+.1f} | {boot_z(tot.values):.1f} | {g.hold.median():.0f} |")
