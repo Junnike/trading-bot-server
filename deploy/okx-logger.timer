@@ -1,0 +1,11 @@
+# /etc/systemd/system/okx-logger.timer — runs the logger every 5 minutes, 30 s after the boundary so funding bills have landed.
+[Unit]
+Description=Run okx-logger every 5 minutes
+
+[Timer]
+OnCalendar=*:0/5:30
+AccuracySec=5s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

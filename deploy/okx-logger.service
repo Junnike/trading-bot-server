@@ -1,0 +1,15 @@
+# /etc/systemd/system/okx-logger.service
+# Install: cp deploy/okx-logger.* /etc/systemd/system/ && cp deploy/okx_logger.env.example /etc/okx_logger.env (fill it, chmod 600)
+#          mkdir -p /var/lib/okx_log && systemctl daemon-reload && systemctl enable --now okx-logger.timer
+# Check:   systemctl list-timers okx-logger.timer ; journalctl -u okx-logger -n 20 ; tail -2 /var/lib/okx_log/snapshots.csv
+[Unit]
+Description=OKX T14 reverse-carry logger (read-only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/okx_logger.env
+WorkingDirectory=/opt/trading-bot-server
+ExecStart=/usr/bin/python3 -I /opt/trading-bot-server/src/okx_logger.py
+Nice=10
