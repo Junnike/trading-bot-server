@@ -21,3 +21,17 @@ Risks not in the numbers: (1) historical borrow rates unknown, likely higher tha
 Venue: needs alt perps AND alt margin borrow on the same exchange: Binance (tested), OKX (public lending rate for MOVE 20 %/yr, API reachable), Bybit (API geo-blocked from this sandbox, unmeasured). Kraken does not list these coins.
 
 Cheapest real-money test: 1 coin from the current basket, ~1,000 USD per leg, 7 days, on Binance or OKX margin: record realised borrow APR, fill slippage on both legs, and funding received. Pass if realised net > +10 %/yr annualised over the week. That is the only test in T12-T13 worth running.
+
+## OKX borrow check (02.11.2026, data/okx_loan_quota.json, results/T13_okx_borrow.csv)
+
+OKX public loan-quota endpoint gives a DAILY basic-tier borrow rate and quota per coin (rate ≈ its Simple-Earn lending rate). OKX lists margin for 262 USDT pairs vs ~318 basket coins borrowable on Binance; only 9 of the top-25 Binance basket names (MOVE, BERA, BIO, KAITO, AXS, AGLD, API3, SEI, AVNT) have OKX margin.
+
+| venue, 2025-01..2026-09, 10 names, maker 2 bp | distinct coins | funding | basis | borrow | fees | net %/yr | 2025 / 2026 | Sharpe |
+|---|---|---|---|---|---|---|---|---|
+| Binance VIP0 only | 318 | +111 | −17 | −50 | −21 | **+24** | +19 / +24 | 3.7 |
+| OKX basic tier only | 149 | +51 | −3 | −14 | −19 | **+15** | +14 / +13 | 3.8 |
+| cheapest venue per coin (both accounts) | 318 | +111 | −17 | −40 | −21 | **+35** | +30 / +30 | 5.3 |
+
+OKX is 2-3x cheaper to borrow (MOVE 20 %, BERA 20 %, KAITO 19 %, AXS 11 %, SEI 16 % APR vs Binance 41-66 %) but its margin universe misses the freshest listings where funding is most negative, so the OKX-only basket earns half the funding. OKX quotas are larger: median 16k USD per coin (Binance 4k), 82 of 149 below 20k. Same caveat as above: today's rates applied to history, and quota ≠ availability.
+
+Practical reading: Binance for coverage, OKX for cost; two accounts and routing each coin to the cheaper venue gives the best number, +35 %/yr on one-leg notional, ≈ +17 % on capital unlevered. Capacity realistic for 10-50k USD.
