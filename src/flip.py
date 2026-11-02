@@ -69,7 +69,7 @@ def bracket(k5, k, setups, side, fee, slip_bp=0):
     """resolve each setup on 5m bars; entry = next tf bar open; stop = pb_low; target = entry + (entry - stop)."""
     o5, h5, l5 = k5.open.values, k5.high.values, k5.low.values
     if side == -1: o5, h5, l5 = -o5, -l5, -h5
-    t5 = k5.index.asi8; rows = []
+    t5 = k5.index.as_unit("ns").asi8; rows = []
     for (d, stop, _, _) in setups:
         if d + 1 >= len(k): continue
         et = k.index[d + 1]; s = np.searchsorted(t5, et.value)
