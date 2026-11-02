@@ -31,3 +31,14 @@ Kalshi BTC CRSI≤20 & hs>0 by month (taker EV c / n): Dec +4.7/44 Jan −1.1/56
 - ALIVE on Kalshi BTC (and weaker on ETH/SOL): the only strategy in T12–T18 with positive EV at a real venue ask, positive every month, and a mechanism (information the minute-1 crowd ignores).
 - Cheapest live test (< 50 USD/day risk): Kalshi BTC only, taker buy YES 20 contracts at the minute-1 ask when CRSI_prev ≤ 20 and hs > 0 (both from a Binance 1-m websocket; the pre-open-minute VWAP and the open print), hold to settlement, 2 weeks, log fill price vs the T18 candle ask. Pass if realised EV > +2c/contract over ≥ 150 signals. Then size up to 100–200 ct.
 - Files: src/twap_label.py (T17), src/kalshi/k8_signal_m1.py (scorer), k9_fills_m1.py (tape fills), k7_trades_first3.py (tape pull), k1/k2_*_series.py (ETH/SOL), src/poly/p3_pull_first3.py + p4_signal_m1.py (Polymarket); results/T17_crsi_twap_label.md, T18_signal_m1.md, T18_fills.md, T18_poly_signal_m1.md.
+
+## 5. CORRECTION after the full pull (29,983 of 30,221 BTC windows, all 11 months; results/T18_signal_m1.md regenerated)
+| signal | n | per day | hit % | mid1 | ask1 | taker EV c | z | months > 0 | maker @bid EV c (fill assumed) |
+|---|---|---|---|---|---|---|---|---|---|
+| CRSI≤20 | 5,090 | 15.7 | 53.6 | 0.506 | 0.517 | −0.15 | −0.2 | 3/11 | +4.0 |
+| CRSI≤20 & hs>0 | 2,234 | 6.9 | **58.4** | 0.543 | 0.554 | **+1.03** | **0.9** | 7/11 | +5.1 |
+| CRSI≤20 & hs>+1 | 1,197 | 3.7 | 59.8 | 0.553 | 0.563 | +1.53 | 1.0 | 6/11 | +5.6 |
+| CRSI≤20 & hs>+3 | 424 | 1.3 | 64.4 | 0.569 | 0.580 | +4.44 | 1.9 | 7/11 | +8.6 |
+| hs>+3 only (control) | 2,556 | 7.9 | 57.6 | 0.567 | 0.578 | −2.19 | −2.3 | 3/11 | +2.1 |
+The 11,083-window sample in §2 (hit 61.9 %, +4.2c, z 2.7, 11/11) was a favourable draw: the 19,000 windows added afterwards hit ~55 % on the same signal. With the whole population the taker edge is +1c per contract and not distinguishable from zero (z 0.9); the hit rate 58.4 % against a market mid of 0.543 is still a real 4-pp mispricing, but the half-spread plus fee (≈ 1.1c + 1.7c) eats it. The tape-fill check (T18_fills.md, +5.4c) was computed on the same lucky sample and carries the same bias.
+**Revised verdict: MARGINAL, not alive.** What survives: (1) Kalshi's minute-1 crowd ignores the previous candle (58 % vs 54 % priced) — a real but small inefficiency; (2) the only way to harvest it is as a MAKER at the bid (+5c if filled), which the T12 replay showed is adversely selected on this venue; (3) the taker version is a coin-flip after costs. The bot (src/kalshi_live/bot.py) stays useful only in --paper mode as a measurement tool: run it two weeks to log real asks and ask depth; do not switch to --live on these numbers. `nothing alive, no test` stands for T12–T18.
