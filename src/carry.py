@@ -11,16 +11,26 @@ Pp, Ss = P.loc[sett], S.loc[sett]
 rp = Pp.pct_change().shift(-1); rs = Ss.pct_change().shift(-1)          # return over the NEXT 8h
 fund_next = F.loc[sett].shift(-1)                                        # funding paid at the END of the next 8h (received by short if >0)
 vol24 = V.rolling(24).sum().loc[sett]
+Bs = (Pp / Ss - 1)
+first = P.apply(lambda c: c.first_valid_index()); last = P.apply(lambda c: c.last_valid_index()); firsts = S.apply(lambda c: c.first_valid_index()); lasts = S.apply(lambda c: c.last_valid_index())
+tt = pd.DataFrame({c: Pp.index for c in Pp.columns}, index=Pp.index)
+sane = (Bs.abs() < 0.02) & (tt.gt(first + pd.Timedelta(days=7)) & tt.gt(firsts + pd.Timedelta(days=7))) & (tt.lt(last - pd.Timedelta(days=14)) & tt.lt(lasts - pd.Timedelta(days=14)))
 def boot_z(x, B=2000, seed=1):
     x = np.asarray(x, float); x = x[~np.isnan(x)]; rng = np.random.default_rng(seed)
     m = x[rng.integers(0, len(x), (B, len(x)))].mean(1); return x.mean() / m.std(ddof=1)
-def run(K, N, minvol, fee_leg, start="2022-02-01", end="2026-09-30", side="long_fund"):
+def run(K, N, minvol, fee_leg, start="2022-02-01", end="2026-09-30", side="long_fund", hyst=1):
     sig = F.loc[sett].rolling(K).mean()                                   # trailing K settlements avg funding (known at t)
-    elig = (vol24 >= minvol) & sig.notna() & Pp.notna() & Ss.notna()
+    elig = (vol24 >= minvol) & sig.notna() & Pp.notna() & Ss.notna() & sane
     s = sig.where(elig)
     if side == "long_fund": rank = s.rank(axis=1, ascending=False)
     else: rank = (-s).rank(axis=1, ascending=False)
-    W = (rank <= N).astype(float); W = W.div(W.sum(1).replace(0, np.nan), axis=0).fillna(0)
+    if hyst == 1: W = (rank <= N).astype(float)
+    else:   # hysteresis: enter when rank<=N, keep while rank<=hyst*N and still eligible
+        ent = (rank <= N).values; keep = (rank <= hyst * N).values & elig.values; Wv = np.zeros(ent.shape); prev = np.zeros(ent.shape[1], bool)
+        for i in range(len(ent)):
+            cur = ent[i] | (prev & keep[i]); Wv[i] = cur; prev = cur
+        W = pd.DataFrame(Wv, index=rank.index, columns=rank.columns)
+    W = W.div(W.sum(1).replace(0, np.nan), axis=0).fillna(0)
     sgn = 1 if side == "long_fund" else -1
     # position PnL: long spot short perp (sgn=1): rs - rp + fund ; reversed for sgn=-1 (needs borrow; flagged)
     pos = sgn * (rs - rp) + sgn * fund_next
@@ -38,20 +48,21 @@ def run(K, N, minvol, fee_leg, start="2022-02-01", end="2026-09-30", side="long_
                 fund_ann=float(fy.mean() * 3 * 365) * 100, basis_ann=float(bas.mean() * 3 * 365) * 100, cost_ann=float((g - n).mean() * 3 * 365) * 100, turnover_day=float(to.mean() * 3), mdd=float(dd) * 100,
                 by_year={str(y): float(((1 + n[n.index.year == y]).prod() - 1) * 100) for y in sorted(set(n.index.year))}, n_avg=float((W[m] > 0).sum(1).mean()))
 rows = []
-for K in [1, 3, 21]:
-    for N in [5, 10, 20, 40]:
-        for minvol in [2e6, 10e6]:
+for hy in [1, 2, 4]:
+  for K in [3, 21]:
+    for N in [10, 20, 40]:
+        for minvol in [10e6]:
             for fee in [0.0005, 0.0002]:
-                rows.append(run(K, N, minvol, fee))
+                r = run(K, N, minvol, fee, hyst=hy); r['hyst'] = hy; rows.append(r)
 R = pd.DataFrame(rows)
-md = ["# T13 — cross-sectional funding carry (long spot / short perp, top-N by trailing funding), all Binance USDT perps with spot pair, 2022-02..2026-09\n",
+md = ["# T13 — cross-sectional funding carry (long spot / short perp, top-N by trailing funding), all Binance USDT perps with spot pair, 2022-02..2026-09. Sanity filters: |perp/spot-1| < 2% at entry, >7 days after listing, >14 days before last data of either leg (delisting; uses the announcement, flagged as mild look-ahead).\n",
       "K = settlements in trailing funding average (1 = last, 3 = 1 day, 21 = 1 week); N = positions; minvol = perp 24h quote volume filter; fee per leg-side (0.05% taker / 0.02% maker), charged on turnover × 2 legs. ann = annualised net return on gross notional of ONE leg (unlevered, cash fully deployed). z = daily bootstrap.\n",
-      "| K | N | minvol | fee | ann net % | Sharpe | z | funding ann % | basis drift ann % | cost ann % | turnover/day | maxDD % | 2022 | 2023 | 2024 | 2025 | 2026 |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+      "| hyst | K | N | minvol | fee | ann net % | Sharpe | z | funding ann % | basis drift ann % | cost ann % | turnover/day | maxDD % | 2022 | 2023 | 2024 | 2025 | 2026 |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
 for r in R.itertuples():
-    by = r.by_year; md.append(f"| {r.K} | {r.N} | {r.minvol/1e6:.0f}M | {r.fee*1e4:.0f}bp | {r.ann:+.1f} | {r.sharpe:.2f} | {r.z:.1f} | {r.fund_ann:+.1f} | {r.basis_ann:+.1f} | {r.cost_ann:.1f} | {r.turnover_day:.2f} | {r.mdd:.1f} | " + " | ".join(f"{by.get(str(y), float('nan')):+.1f}" for y in range(2022, 2027)) + " |")
+    by = r.by_year; md.append(f"| {r.hyst} | {r.K} | {r.N} | {r.minvol/1e6:.0f}M | {r.fee*1e4:.0f}bp | {r.ann:+.1f} | {r.sharpe:.2f} | {r.z:.1f} | {r.fund_ann:+.1f} | {r.basis_ann:+.1f} | {r.cost_ann:.1f} | {r.turnover_day:.2f} | {r.mdd:.1f} | " + " | ".join(f"{by.get(str(y), float('nan')):+.1f}" for y in range(2022, 2027)) + " |")
 # benchmark: all eligible positive-funding, and reverse side (short spot needs borrow)
 b = run(3, 1000, 2e6, 0.0002); md.append(f"\nBenchmark all-eligible positive-funding equal weight (K3, maker): ann {b['ann']:+.1f}%, Sharpe {b['sharpe']:.2f}, funding {b['fund_ann']:+.1f}%, basis drift {b['basis_ann']:+.1f}%, avg positions {b['n_avg']:.0f}")
-rv = run(3, 10, 2e6, 0.0002, side="short_fund"); md.append(f"Reverse side (long perp / short spot, most negative funding, K3 N10 maker; ignores spot borrow cost): ann {rv['ann']:+.1f}%, Sharpe {rv['sharpe']:.2f}, by year " + ", ".join(f"{k}:{v:+.0f}" for k, v in rv['by_year'].items()))
+rv = run(3, 10, 10e6, 0.0002, side="short_fund"); md.append(f"Reverse side (long perp / short spot, most negative funding, K3 N10 maker; ignores spot borrow cost): ann {rv['ann']:+.1f}%, Sharpe {rv['sharpe']:.2f}, of which funding {rv['fund_ann']:+.1f}%/yr and basis convergence {rv['basis_ann']:+.1f}%/yr, cost {rv['cost_ann']:.1f}%/yr; by year " + ", ".join(f"{k}:{v:+.0f}" for k, v in rv['by_year'].items()))
 best = R[(R.fee == 0.0002)].sort_values("sharpe", ascending=False).iloc[0]
-md.append(f"\nBest maker cell: K{best.K} N{best.N} minvol {best.minvol/1e6:.0f}M -> ann {best.ann:+.1f}%, Sharpe {best.sharpe:.2f}, z {best.z:.1f}, 2025 {best.by_year.get('2025', float('nan')):+.1f}%, 2026 {best.by_year.get('2026', float('nan')):+.1f}%")
+md.append(f"\nBest maker cell: hyst{best.hyst} K{best.K} N{best.N} minvol {best.minvol/1e6:.0f}M -> ann {best.ann:+.1f}%, Sharpe {best.sharpe:.2f}, z {best.z:.1f}, 2025 {best.by_year.get('2025', float('nan')):+.1f}%, 2026 {best.by_year.get('2026', float('nan')):+.1f}%")
 open(f"{RES}/T13_carry.md", "w").write("\n".join(md) + "\n"); R.to_pickle(f"{RES}/T13_carry.pkl"); print("\n".join(md[-3:]))

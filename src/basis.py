@@ -8,6 +8,10 @@ C = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "cach
 P = pd.read_pickle(f"{C}/panel_perp.pkl"); S = pd.read_pickle(f"{C}/panel_spot.pkl"); V = pd.read_pickle(f"{C}/panel_qv.pkl"); F = pd.read_pickle(f"{C}/panel_fund.pkl").fillna(0)
 liq = V.rolling(24).sum() >= 10e6
 B = (P / S - 1).where(liq)
+first = P.apply(lambda c: c.first_valid_index()); last = P.apply(lambda c: c.last_valid_index()); firsts = S.apply(lambda c: c.first_valid_index()); lasts = S.apply(lambda c: c.last_valid_index())
+tt = pd.DataFrame({c: P.index for c in P.columns}, index=P.index)
+sane = (B.abs() < 0.02) & tt.gt(first + pd.Timedelta(days=7)) & tt.gt(firsts + pd.Timedelta(days=7)) & tt.lt(last - pd.Timedelta(days=14)) & tt.lt(lasts - pd.Timedelta(days=14))
+B = B.where(sane)
 def boot_z(x, B_=2000, seed=1):
     x = np.asarray(x, float); x = x[~np.isnan(x)]; rng = np.random.default_rng(seed)
     if len(x) < 10: return np.nan
