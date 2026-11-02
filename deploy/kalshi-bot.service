@@ -1,0 +1,19 @@
+# /etc/systemd/system/kalshi-bot.service
+# Install: pip3 install cryptography; cp deploy/kalshi-bot.service /etc/systemd/system/; cp deploy/kalshi_bot.env.example /etc/kalshi_bot.env (fill, chmod 600)
+#          mkdir -p /var/lib/kalshi_bot; systemctl daemon-reload; systemctl enable --now kalshi-bot
+# Paper first: leave ExecStart with --paper for >= 2 days, compare signals.csv ask_c with results/T18_signal_m1.md, then switch to --live.
+# Stop trading without stopping logging: touch /var/lib/kalshi_bot/KILL
+[Unit]
+Description=T18 Kalshi BTC 15m live-test bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/kalshi_bot.env
+WorkingDirectory=/opt/trading-bot-server
+ExecStart=/usr/bin/python3 /opt/trading-bot-server/src/kalshi_live/bot.py --paper
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
