@@ -162,6 +162,7 @@ def main():
         t = time.time(); T = int(t // 900) * 900           # current window open
         if T != last_T and t - T >= 61 + LAT:                # minute 1 passed: act once per window
             last_T = T
+            if t - T > 90: log(f"window {T}: started late ({t - T:.0f}s in), skip"); continue
             try:
                 reconcile(s)
                 sig = compute_signal(T)
