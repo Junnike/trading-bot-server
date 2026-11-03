@@ -22,6 +22,13 @@ def load_aster():
         s = pd.Series([float(x["fundingRate"]) for x in d], index=pd.to_datetime([x["fundingTime"] for x in d], unit="ms", utc=True).round("h"))
         F[os.path.basename(p)[:-9]] = s[~s.index.duplicated()].sort_index()
     return pd.DataFrame(F)
+def load_aster_vol():
+    V = {}
+    for p in glob.glob(f"{ROOT}/dex/aster_vol/*.json"):
+        d = json.load(open(p))
+        if not d: continue
+        V[norm(os.path.basename(p)[:-9])] = pd.Series([float(x[1]) for x in d], index=pd.to_datetime([x[0] for x in d], unit="ms", utc=True))
+    return pd.DataFrame(V)
 def load_binance():
     P = pd.read_pickle(f"{ROOT}/cache/panel_fund.pkl"); P.columns = [c[:-4] for c in P.columns]; return P[P.index.hour.isin([0, 8, 16])]
 def norm(name):  # Hyperliquid uses k-prefixed names for 1000x coins (kPEPE), Binance/Aster use 1000PEPE
@@ -29,10 +36,13 @@ def norm(name):  # Hyperliquid uses k-prefixed names for 1000x coins (kPEPE), Bi
 def boot_z(x, B=2000, seed=1):
     x = np.asarray(x, float); x = x[~np.isnan(x)]; rng = np.random.default_rng(seed)
     m = x[rng.integers(0, len(x), (B, len(x)))].mean(1); return x.mean() / m.std(ddof=1)
-def run(FA, FB, K, N, fee, hyst=2, enter_ann=0.0, start="2025-01-01"):
+def run(FA, FB, K, N, fee, hyst=2, enter_ann=0.0, start="2025-01-01", minvol=0.0, VOL=None):
     """FA, FB: 8h funding frames aligned (same columns, same index). Spread s = |fA - fB| per 8h; long the lower, short the higher."""
     s = (FA - FB); sig = s.rolling(K).mean(); absig = sig.abs()
-    elig = absig.notna() & (absig * 3 * 365 >= enter_ann)
+    elig = absig.notna() & (absig * 3 * 365 * 100 >= enter_ann)
+    if minvol > 0 and VOL is not None:
+        v = VOL.reindex(columns=s.columns).resample("8h").ffill().reindex(s.index).ffill().shift(1)   # previous day's Aster quote volume, known at decision time
+        elig = elig & (v >= minvol)
     rank = absig.where(elig).rank(axis=1, ascending=False)
     ent = (rank <= N).values; keep = (rank <= hyst * N).values & absig.notna().values; side = np.sign(sig.values)  # +1: fA > fB -> short A long B
     W = np.zeros(ent.shape); S = np.zeros(ent.shape); prev = np.zeros(ent.shape[1], bool); prevside = np.zeros(ent.shape[1])
@@ -52,23 +62,45 @@ HL, AS, BN = load_hl(), load_aster(), load_binance()
 HL.columns = [norm(c) for c in HL.columns]; AS.columns = [norm(c) for c in AS.columns]; BN.columns = [norm(c) for c in BN.columns]
 md = ["# T20 — cross-venue funding arbitrage (no borrow): long the lower-funding perp, short the higher, same coin (03.11.2026)\n",
       f"Data: Hyperliquid hourly funding {len(HL.columns)} coins (summed to 8h), Aster 8h funding {len(AS.columns)} symbols, Binance 8h (reference, not EU-accessible) {len(BN.columns)}. Fees per leg-side on turnover, 2 legs; price basis between the two perps ignored (both track the same index; see caveats).\n"]
+AV = load_aster_vol()
 for name, (A, B) in {"Hyperliquid vs Aster (both reachable from the EU with a wallet)": (HL, AS), "Hyperliquid vs Binance (reference)": (HL, BN), "Aster vs Binance (reference)": (AS, BN)}.items():
     common = sorted(set(A.columns) & set(B.columns)); idx = A.index.intersection(B.index)
     FA, FB = A.loc[idx, common], B.loc[idx, common]; both = FA.notna() & FB.notna(); FA, FB = FA.where(both), FB.where(both)
     sp = (FA - FB).abs() * 3 * 365 * 100
     md.append(f"\n## {name}: {len(common)} common coins, {idx.min().date()}..{idx.max().date()}, coin-periods with both rates {int(both.values.sum())}\n")
     md.append(f"Spread distribution (annualised |fA−fB|, per coin-period): median {np.nanmedian(sp.values):.1f} %/yr, 90th pct {np.nanpercentile(sp.values, 90):.1f}, 99th {np.nanpercentile(sp.values, 99):.1f}. Share of coin-periods with spread > 30 %/yr: {(sp > 30).values.sum() / both.values.sum() * 100:.1f} %.\n")
-    md.append("| K | N | hyst | enter ≥ %/yr | fee | gross %/yr | cost %/yr | net ann % | Sharpe | z | turnover/day | maxDD % | avg positions | by quarter |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
-    for K in [3, 21]:
+    md.append("| Aster vol ≥ | K | N | hyst | enter ≥ %/yr | fee | gross %/yr | cost %/yr | net ann % | Sharpe | z | turnover/day | maxDD % | avg positions | by quarter |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for mv in ([0, 1e6, 5e6] if "Aster" in name else [0]):
+      for K in [3, 21]:
         for N in [5, 10, 20]:
             for hy, en in [(2, 0), (4, 20), (4, 40)]:
                 for fee in [0.00035, 0.00015]:
-                    r = run(FA, FB, K, N, fee, hy, en)
-                    md.append(f"| {K} | {N} | {hy} | {en} | {fee*1e4:.1f}bp | {r['gross_ann']:+.1f} | {r['cost_ann']:.1f} | {r['ann']:+.1f} | {r['sharpe']:.2f} | {r['z']:.1f} | {r['turnover_day']:.2f} | {r['mdd']:.1f} | {r['n_avg']:.1f} | " + " ".join(f"{q[2:]}:{v:+.0f}" for q, v in r["by_q"].items()) + " |")
+                    r = run(FA, FB, K, N, fee, hy, en, minvol=mv, VOL=AV)
+                    md.append(f"| {mv/1e6:.0f}M | {K} | {N} | {hy} | {en} | {fee*1e4:.1f}bp | {r['gross_ann']:+.1f} | {r['cost_ann']:.1f} | {r['ann']:+.1f} | {r['sharpe']:.2f} | {r['z']:.1f} | {r['turnover_day']:.2f} | {r['mdd']:.1f} | {r['n_avg']:.1f} | " + " ".join(f"{q[2:]}:{v:+.0f}" for q, v in r["by_q"].items()) + " |")
+# diagnostics for HL vs Aster, K3 N10 hyst2 maker: PnL by coin, sign, Aster liquidity
+common = sorted(set(HL.columns) & set(AS.columns)); idx = HL.index.intersection(AS.index); FA, FB = HL.loc[idx, common], AS.loc[idx, common]; both = FA.notna() & FB.notna(); FA, FB = FA.where(both), FB.where(both)
+s_ = (FA - FB); sig = s_.rolling(3).mean(); rank = sig.abs().rank(axis=1, ascending=False); W = (rank <= 10).astype(float); W = W.div(W.sum(1).replace(0, np.nan), axis=0).fillna(0)
+contrib = (W * np.sign(sig) * s_.shift(-1)).sum() * 100   # % of one-leg notional over the sample, per coin
+sideA = (W * np.sign(sig)).sum()                             # >0: mostly SHORT on Hyperliquid (HL funding higher), <0: mostly LONG on HL
+top = contrib.sort_values(ascending=False).head(15)
+import subprocess
+vol = {}
+try:
+    t24 = json.loads(subprocess.run(["curl", "-sS", "--max-time", "20", "https://fapi.asterdex.com/fapi/v1/ticker/24hr"], capture_output=True, text=True).stdout)
+    vol = {norm(x["symbol"][:-4]): float(x.get("quoteVolume", 0)) for x in t24 if x["symbol"].endswith("USDT")}
+except Exception: pass
+md.append("\n## Diagnostics, HL vs Aster, K3 N10 hyst2 (no entry threshold): where the money comes from\n| coin | cum contribution % (of one-leg notional, whole sample) | share of basket-periods | avg side (+ = short HL / long Aster, − = long HL / short Aster) | mean |spread| when held %/yr | Aster 24h volume now USD |\n|---|---|---|---|---|---|")
+for c in top.index:
+    held = W[c] > 0
+    md.append(f"| {c} | {top[c]:+.1f} | {held.mean()*100:.1f}% | {sideA[c]/max(held.sum(),1):+.2f} | {(s_[c].abs()[held].mean()*3*365*100) if held.any() else float('nan'):.0f} | {vol.get(c, float('nan')):,.0f} |")
+md.append(f"Top-15 coins carry {top.sum()/contrib.sum()*100:.0f}% of total PnL; coins ever in basket: {(W.sum()>0).sum()}; Aster 24h volume median across basket coins: {np.nanmedian([vol.get(c, np.nan) for c in top.index]):,.0f} USD.")
 # current cross-venue snapshot from Hyperliquid's predictedFundings
 try:
     import subprocess
-    pf = json.loads(subprocess.run(["curl", "-sS", "--max-time", "20", "-X", "POST", "-H", "Content-Type: application/json", "-d", '{"type":"predictedFundings"}', "https://api.hyperliquid.xyz/info"], capture_output=True, text=True).stdout)
+    pf = None
+    for _ in range(3):
+        try: pf = json.loads(subprocess.run(["curl", "-sS", "--max-time", "20", "-X", "POST", "-H", "Content-Type: application/json", "-d", '{"type":"predictedFundings"}', "https://api.hyperliquid.xyz/info"], capture_output=True, text=True).stdout); break
+        except Exception: pass
     rows = []
     for coin, vs in pf:
         d = {v: float(x["fundingRate"]) * (8 / float(x.get("fundingIntervalHours", 8))) for v, x in vs}
