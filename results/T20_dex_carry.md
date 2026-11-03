@@ -312,3 +312,19 @@ Aster has data only from 2025Q3 (launch); the 2025Q1–Q2 zeros are absence of d
 Venue basis (results/T20_venue_basis.csv, 12 liquid common coins, 60 days hourly): median |HL − Aster| 6.5 bp, mean 8h change 5.7 bp, 95th pct 15 bp. Entering/exiting a pair therefore costs ±6 bp of basis on top of 6 bp fees; at 0.37 switches/day that is ≈ 0 expected but ≈ 8 %/yr if systematically adverse, and it adds the variance the Sharpe above does not show.
 Capital: both legs need margin on two venues, so return on account ≈ half the one-leg figure: **≈ 9 %/yr at the 1M filter, ≈ 4–5 % at 5M**, market-neutral, no borrow, both venues reachable from Estonia with a wallet (legal status for EU retail on DEX perps is grey, not prohibited for the user).
 Verdict: ALIVE-small. Comparable to the T13 reverse carry after costs but without the borrow problem and without the venue-access problem. The live number to measure is not the funding (visible) but fills and basis on Aster's small-coin books. Cheapest test: 2 coins from the current screen, 500 USD per leg per venue, 7 days, log funding received on both legs, fills, and basis at entry/exit; pass if realised net > +5 %/yr annualised on account capital.
+
+## Live snapshot now (8h-equivalent %/yr), Aster 24h volume >= 1M USD: largest Hyperliquid − Aster funding spreads
+| coin | HL − Aster | HL | Aster | Aster 24h vol USD | trade |
+|---|---|---|---|---|---|
+| WLFI | -17 | +11 | +28 | 2,227,478 | long HL / short Aster |
+| ASTER | -10 | +11 | +21 | 21,736,794 | long HL / short Aster |
+| DOGE | +6 | +11 | +5 | 13,450,423 | short HL / long Aster |
+| ENA | +5 | +11 | +5 | 1,231,548 | short HL / long Aster |
+| HYPE | +5 | +11 | +5 | 29,149,408 | short HL / long Aster |
+| LIT | +5 | +11 | +5 | 2,141,930 | short HL / long Aster |
+| BNB | -2 | +11 | +13 | 9,091,224 | long HL / short Aster |
+| SOL | -1 | +10 | +11 | 46,458,072 | long HL / short Aster |
+| BTC | +0 | +11 | +11 | 351,566,090 | long HL / short Aster |
+| ETH | +0 | +11 | +11 | 363,234,329 | long HL / short Aster |
+
+Liquid common coins right now: 14; spreads above 20 %/yr: 0.
