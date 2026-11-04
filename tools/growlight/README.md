@@ -2,6 +2,7 @@
 
 One HTML file. No server, no GPU, no install. PPFD heatmap, DLI, uniformity, spectrum mix and cost for any room and any mix of lamps,
 with wall reflections, lamp size, asymmetric beams, IES/LDT photometric files, lumens-to-PPF conversion, plant targets, English and Estonian.
+Four colour themes in the top bar (Ice blue, Moss green, Sand beige, Dusk violet), each with a light and a dark version; the heat-map colours and the PNG export follow the theme, and the choice is remembered by the browser.
 
 ## Use it
 - **Any computer (Windows, Mac, Linux):** copy `index.html` anywhere and double-click it. Everything runs in the browser. Internet is only used for the two fonts; offline it falls back to the system font.

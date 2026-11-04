@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: app shell. Sticky top bar; three columns on wide screens (setup | stage | results) that stack to one column under 1100px.
-   The heatmap is the hero; everything else is quiet. Ice-blue accents on deep navy, dark-first; the light theme keeps the same hierarchy. */
+   The heatmap is the hero; everything else is quiet. Four themes (ice, moss, sand, dusk) chosen with data-palette, each with a dark and a light set chosen with data-theme; ice dark is the default and the only set on the bare :root. */
 :root{
   --bg:#0a1322; --panel:#101d31; --panel-2:#16283f; --line:#24405f; --line-2:#345c86;
   --fg:#e9f3ff; --muted:#93b1cf; --accent:#8be4ff; --accent-2:#36b3ea; --accent-ink:#06283a;
@@ -26,6 +26,24 @@
   :root:not([data-theme="dark"]){ --bg:#eef4fa; --panel:#ffffff; --panel-2:#e6eff8; --line:#c3d6ea; --line-2:#9fbcd9; --fg:#0c1b2d; --muted:#4e6c8c; --accent:#0a84c6; --accent-2:#0369a1; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,50,90,.12); color-scheme:light }
 }
 :root[data-theme="light"]{ --bg:#eef4fa; --panel:#ffffff; --panel-2:#e6eff8; --line:#c3d6ea; --line-2:#9fbcd9; --fg:#0c1b2d; --muted:#4e6c8c; --accent:#0a84c6; --accent-2:#0369a1; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,50,90,.12); color-scheme:light }
+/* Moss: deep green with a mint accent. */
+:root[data-palette="moss"]{ --bg:#0a1510; --panel:#102019; --panel-2:#172b22; --line:#25453a; --line-2:#37685a; --fg:#ecf6ee; --muted:#9dbfaa; --accent:#9ff2b0; --accent-2:#3fc77c; --accent-ink:#06301a; --good:#8ae8a4; --warn:#ffd36b; --bad:#ff7b7b; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="moss"]:not([data-theme="dark"]){ --bg:#eef4ee; --panel:#ffffff; --panel-2:#e2eee4; --line:#c2d9c8; --line-2:#9bc2a6; --fg:#0f1f16; --muted:#4f6e5b; --accent:#1f8a4c; --accent-2:#166b3a; --accent-ink:#ffffff; --good:#1f8a4c; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,70,40,.12); color-scheme:light }
+}
+:root[data-palette="moss"][data-theme="light"]{ --bg:#eef4ee; --panel:#ffffff; --panel-2:#e2eee4; --line:#c2d9c8; --line-2:#9bc2a6; --fg:#0f1f16; --muted:#4f6e5b; --accent:#1f8a4c; --accent-2:#166b3a; --accent-ink:#ffffff; --good:#1f8a4c; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,70,40,.12); color-scheme:light }
+/* Sand: warm beige paper with a terracotta accent; its dark set is warm brown. */
+:root[data-palette="sand"]{ --bg:#171310; --panel:#211b16; --panel-2:#2b241d; --line:#43382c; --line-2:#65543f; --fg:#f4ecdf; --muted:#b8a78f; --accent:#f0c178; --accent-2:#d9962f; --accent-ink:#2a1d08; --good:#86dba0; --warn:#ffd56e; --bad:#ff8a80; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="sand"]:not([data-theme="dark"]){ --bg:#f3eee4; --panel:#fffcf6; --panel-2:#ece4d5; --line:#d8ccb6; --line-2:#bda98a; --fg:#2a2218; --muted:#7a6a54; --accent:#b9641f; --accent-2:#8f4a12; --accent-ink:#ffffff; --good:#257a4a; --warn:#a5660a; --bad:#c0392b; --shadow:0 10px 30px rgba(80,60,20,.12); color-scheme:light }
+}
+:root[data-palette="sand"][data-theme="light"]{ --bg:#f3eee4; --panel:#fffcf6; --panel-2:#ece4d5; --line:#d8ccb6; --line-2:#bda98a; --fg:#2a2218; --muted:#7a6a54; --accent:#b9641f; --accent-2:#8f4a12; --accent-ink:#ffffff; --good:#257a4a; --warn:#a5660a; --bad:#c0392b; --shadow:0 10px 30px rgba(80,60,20,.12); color-scheme:light }
+/* Dusk: plum with a lavender accent. */
+:root[data-palette="dusk"]{ --bg:#110c1c; --panel:#191230; --panel-2:#221a3f; --line:#37305e; --line-2:#514687; --fg:#f1ecff; --muted:#a99ecf; --accent:#c9b3ff; --accent-2:#8f6cff; --accent-ink:#1b0f3d; --good:#7fe6b0; --warn:#ffcf6b; --bad:#ff7a9a; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="dusk"]:not([data-theme="dark"]){ --bg:#f1eef8; --panel:#ffffff; --panel-2:#e8e3f5; --line:#cdc5e6; --line-2:#a89bd3; --fg:#171130; --muted:#5d5480; --accent:#6a3ed9; --accent-2:#4f2bb0; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(50,30,100,.12); color-scheme:light }
+}
+:root[data-palette="dusk"][data-theme="light"]{ --bg:#f1eef8; --panel:#ffffff; --panel-2:#e8e3f5; --line:#cdc5e6; --line-2:#a89bd3; --fg:#171130; --muted:#5d5480; --accent:#6a3ed9; --accent-2:#4f2bb0; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(50,30,100,.12); color-scheme:light }
 
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -88,6 +106,9 @@ body.geekmode .geek.block{display:block}
 .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
 .seg button{background:transparent;border:0;padding:5px 9px;font-size:12px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg.pal button{display:inline-flex;align-items:center;gap:6px}
+.seg.pal i{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(0,0,0,.35) inset;flex:none}
+@media (max-width:760px){.seg.pal span{display:none}.seg.pal button{padding:6px 8px}}
 
 .type{gap:8px}
 .type .head{display:flex;align-items:center;gap:8px}
@@ -141,7 +162,8 @@ details p{margin-top:8px;font-size:12px;color:var(--muted)}
     <button class="btn small" id="btnExample" type="button" data-i18n="example">Example room</button>
     <button class="btn small" id="btnSave" type="button" data-i18n="save">Save JSON</button>
     <label class="btn small" for="fileLoad" data-i18n="load">Load JSON</label><input type="file" id="fileLoad" accept=".json,application/json" hidden>
-    <button class="btn small" id="themeToggle" type="button" data-i18n="theme">Theme</button>
+    <div class="seg pal" role="group" aria-label="Theme" id="palettes"><button type="button" data-pal="ice" aria-pressed="true" title="Ice blue"><i style="background:#8be4ff"></i><span data-i18n="palIce">Ice</span></button><button type="button" data-pal="moss" aria-pressed="false" title="Moss green"><i style="background:#9ff2b0"></i><span data-i18n="palMoss">Moss</span></button><button type="button" data-pal="sand" aria-pressed="false" title="Sand beige"><i style="background:#e0b070"></i><span data-i18n="palSand">Sand</span></button><button type="button" data-pal="dusk" aria-pressed="false" title="Dusk violet"><i style="background:#c9b3ff"></i><span data-i18n="palDusk">Dusk</span></button></div>
+    <button class="btn small" id="themeToggle" type="button" data-i18n="theme" title="Switch between the light and the dark version of the theme">Light / dark</button>
   </div>
 </div></header>
 
@@ -317,6 +339,7 @@ const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add
 /* ---------------- languages ---------------- */
 const I18N = {
   en: {
+    theme: 'Light / dark', palIce: 'Ice', palMoss: 'Moss', palSand: 'Sand', palDusk: 'Dusk',
     vTarget: 'Target fit', vBlue: 'Blue %', vRfr: 'Red : far-red',
     reflX: 'Ends (left / right) reflect', reflY: 'Sides (front / back) reflect', margin: 'Canopy margin', shelfHint: 'For a shelf in a rack set the ends to 100 % (the next block repeats the same lamps) and the sides to 0 % (open). The margin excludes a strip along all four edges from the statistics.', layRows: 'Rows (along the length)', layCols: 'Columns (along the width)', exampleL: 'Load an example', exTent: 'Tent 1.2 m, one 630 W bar light', exShelf: 'Rack shelf 3.7 × 1.08 m, tubes at 35 cm', wShelf: 'Shelf in a rack: ends continue, sides open', coarse: 'Map made coarser to stay fast', tdir: 'tilt toward, ° (0 = +x, 90 = +y)',
     ofPpf: 'of PPF', noFr: 'no far-red', tiersNote: 'tiers in total: power and cost are multiplied, the map shows one tier.', perDay: 'per day',
@@ -334,7 +357,7 @@ const I18N = {
     fitLow: 'Even at 5 cm the average is below target: add lamps', fitHigh: 'Even at 6 m it is too bright: remove lamps', fitSet: 'Hang height set to',
   },
   et: {
-    tagline: 'PPFD, DLI ja spekter igale ruumile ja igale valgustite kombinatsioonile', geek: 'Nohiku režiim', example: 'Näidisruum', save: 'Salvesta JSON', load: 'Laadi JSON', theme: 'Teema',
+    tagline: 'PPFD, DLI ja spekter igale ruumile ja igale valgustite kombinatsioonile', geek: 'Nohiku režiim', example: 'Näidisruum', save: 'Salvesta JSON', load: 'Laadi JSON', theme: 'Hele / tume', palIce: 'Jää', palMoss: 'Sammal', palSand: 'Liiv', palDusk: 'Hämarik',
     s1: '1 · Taim', plantQ: 'Mida sa kasvatad?', hours: 'Valgustunde ööpäevas', custRange: 'Siht-PPFD vahemik',
     s2: '2 · Ruum või telk', width: 'Laius', length: 'Pikkus', walls: 'Seinad', refl: 'Seinte peegeldus', bounces: 'Peegelduste arv', b0: 'puudub', b1: '1 peegeldus', b2: '2 peegeldust', b3: '3 peegeldust (aeglane)',
     s3: '3 · Valgustid', hang: 'Riputuskõrgus taimede kohal', fit: 'Sobita kõrgus sihile', addType: '+ Lisa teine valgustitüüp (sega)', suggest: 'Soovita kogus', placement: 'Paigutus', auto: 'Automaatpaigutus',
@@ -650,15 +673,33 @@ const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), pa
 function buildCmap(stops) { const m = new Uint8ClampedArray(256 * 3); for (let i = 0; i < 256; i++) { const x = i / 255; let k = 0; while (k < stops.length - 2 && stops[k + 1][0] < x) k++; const [a, ca] = stops[k], [b, cb] = stops[k + 1], f = clamp((x - a) / (b - a || 1), 0, 1), A = hex(ca), Bc = hex(cb); for (let c = 0; c < 3; c++) m[i * 3 + c] = A[c] + (Bc[c] - A[c]) * f; } return m; }
 const CM_ICE = buildCmap([[0, '#071024'], [.15, '#10306a'], [.35, '#1f63c3'], [.55, '#2fb8ea'], [.72, '#8df2ff'], [.86, '#e8fcff'], [1, '#ffe9a0']]);
 const CM_COOL = buildCmap([[0, '#071024'], [.5, '#1d6fd0'], [1, '#9be9ff']]);
+const alpha = (h, a) => { const v = hex(h); return `rgba(${v[0]},${v[1]},${v[2]},${a})`; };
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/* Themes: each has its natural light/dark mode and its own heat-map ramps (seq for PPFD/DLI, cool for blue % and R:FR). All ramps run dark → light so the map reads the same way in every theme. */
+const PALETTES = {
+  ice: { mode: 'dark', seq: CM_ICE, cool: CM_COOL },
+  moss: { mode: 'dark', seq: buildCmap([[0, '#06130b'], [.15, '#0d3a22'], [.35, '#1b7a3e'], [.55, '#3cc46c'], [.72, '#9af2a6'], [.86, '#eaffe8'], [1, '#fff0a0']]), cool: buildCmap([[0, '#06130b'], [.5, '#1d8a52'], [1, '#b8f5c8']]) },
+  sand: { mode: 'light', seq: buildCmap([[0, '#160f07'], [.15, '#4a2a10'], [.35, '#9a4f1c'], [.55, '#d9893a'], [.72, '#f4c988'], [.86, '#fae8cc'], [1, '#fffdf5']]), cool: buildCmap([[0, '#160f07'], [.5, '#a8641e'], [1, '#f9dfb0']]) },
+  dusk: { mode: 'dark', seq: buildCmap([[0, '#0b0514'], [.15, '#2a1458'], [.35, '#5c2bb0'], [.55, '#a24fe0'], [.72, '#e49bff'], [.86, '#f9e9ff'], [1, '#ffe9a0']]), cool: buildCmap([[0, '#0b0514'], [.5, '#6d3fd0'], [1, '#e6c8ff']]) },
+};
+let PALETTE = 'ice';
+const CM = () => PALETTES[PALETTE] || PALETTES.ice;
+function applyPalette(p, withMode, draw) {
+  PALETTE = PALETTES[p] ? p : 'ice'; const r = document.documentElement; r.setAttribute('data-palette', PALETTE);
+  $$('#palettes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pal === PALETTE ? 'true' : 'false'));
+  if (withMode) { r.setAttribute('data-theme', CM().mode); try { localStorage.setItem('growlight.theme', CM().mode); } catch (e) {} }
+  try { localStorage.setItem('growlight.palette', PALETTE); } catch (e) {}
+  if (draw && ST) render();
+}
 const niceCeil = (v) => { if (!(v > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; const n = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10; return n * p; };
 function viewSpec() {
   const pl = ST.pl;
   switch (S.view) {
     case 'target': return { kind: 'target', label: t('vTarget'), lo: pl.lo, hi: pl.hi };
-    case 'dli': return { kind: 'seq', data: (k) => M.ppfd[k] * S.hours * 0.0036 + +S.ambient, max: niceCeil(Math.max(ST.dli * 1.2, pl.dli[1] * 1.1, ST.max * S.hours * 0.0036 + +S.ambient)), cmap: CM_ICE, label: t('lDli'), band: pl.dli, dec: 1 };
-    case 'blue': return { kind: 'seq', data: (k) => M.epar[k] > 0 ? 100 * M.B[k] / M.epar[k] : 0, max: 40, cmap: CM_COOL, label: t('lBlue'), dec: 0 };
-    case 'rfr': return { kind: 'seq', data: (k) => M.FR[k] > 0 ? Math.min(30, M.R[k] / M.FR[k]) : 30, max: 30, cmap: CM_COOL, label: t('lRfr'), dec: 1 };
-    default: return { kind: 'seq', data: (k) => M.ppfd[k], max: niceCeil(Math.max(ST.max * 1.05, pl.hi * 1.1)), cmap: CM_ICE, label: t('lPpfd'), band: [pl.lo, pl.hi], dec: 0 };
+    case 'dli': return { kind: 'seq', data: (k) => M.ppfd[k] * S.hours * 0.0036 + +S.ambient, max: niceCeil(Math.max(ST.dli * 1.2, pl.dli[1] * 1.1, ST.max * S.hours * 0.0036 + +S.ambient)), cmap: CM().seq, label: t('lDli'), band: pl.dli, dec: 1 };
+    case 'blue': return { kind: 'seq', data: (k) => M.epar[k] > 0 ? 100 * M.B[k] / M.epar[k] : 0, max: 40, cmap: CM().cool, label: t('lBlue'), dec: 0 };
+    case 'rfr': return { kind: 'seq', data: (k) => M.FR[k] > 0 ? Math.min(30, M.R[k] / M.FR[k]) : 30, max: 30, cmap: CM().cool, label: t('lRfr'), dec: 1 };
+    default: return { kind: 'seq', data: (k) => M.ppfd[k], max: niceCeil(Math.max(ST.max * 1.05, pl.hi * 1.1)), cmap: CM().seq, label: t('lPpfd'), band: [pl.lo, pl.hi], dec: 0 };
   }
 }
 function cellColor(vs, k, out) {
@@ -741,12 +782,12 @@ function drawSections(col, fb, dpr) {
   const draw = (cv, vals, len, title) => {
     const W = cv.clientWidth || 300, H = 150; cv.width = W * dpr; cv.height = H * dpr; const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height);
     const pl = ST.pl, vmax = niceCeil(Math.max(...vals, pl.hi) * 1.1), x0 = 36 * dpr, y0 = 10 * dpr, w = cv.width - x0 - 10 * dpr, h = cv.height - y0 - 24 * dpr;
-    c.fillStyle = 'rgba(92,232,166,0.12)'; c.fillRect(x0, y0 + h * (1 - pl.hi / vmax), w, h * (pl.hi - pl.lo) / vmax);
+    c.fillStyle = alpha(col('--good'), 0.12); c.fillRect(x0, y0 + h * (1 - pl.hi / vmax), w, h * (pl.hi - pl.lo) / vmax);
     c.strokeStyle = col('--line'); c.lineWidth = dpr; for (let k = 0; k <= 4; k++) { const Y = y0 + h * k / 4; c.beginPath(); c.moveTo(x0, Y); c.lineTo(x0 + w, Y); c.stroke(); }
     c.fillStyle = col('--muted'); c.font = `${10 * dpr}px ${fb}`; c.textAlign = 'right'; c.textBaseline = 'middle';
     for (let k = 0; k <= 4; k++) c.fillText(fmt(vmax * (1 - k / 4)), x0 - 4 * dpr, y0 + h * k / 4);
     c.beginPath(); vals.forEach((v, i) => { const X = x0 + w * (i + 0.5) / vals.length, Y = y0 + h * (1 - clamp(v / vmax, 0, 1)); i ? c.lineTo(X, Y) : c.moveTo(X, Y); });
-    c.strokeStyle = col('--accent'); c.lineWidth = 2 * dpr; c.stroke(); c.lineTo(x0 + w, y0 + h); c.lineTo(x0, y0 + h); c.closePath(); c.fillStyle = 'rgba(139,228,255,0.12)'; c.fill();
+    c.strokeStyle = col('--accent'); c.lineWidth = 2 * dpr; c.stroke(); c.lineTo(x0 + w, y0 + h); c.lineTo(x0, y0 + h); c.closePath(); c.fillStyle = alpha(col('--accent'), 0.12); c.fill();
     c.fillStyle = col('--muted'); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillText(title, x0, cv.height - 8 * dpr); c.textAlign = 'right'; c.fillText(`${fmt(len, 2)} m`, x0 + w, cv.height - 8 * dpr);
   };
   const jm = Math.floor(G.ny / 2), im = Math.floor(G.nx / 2);
@@ -956,6 +997,7 @@ function bindEvents() {
   $('#btnExample').addEventListener('click', () => loadExample('tent'));
   $('#langEn').addEventListener('click', () => { S.lang = 'en'; LANG = 'en'; applyLang(); persist(); }); $('#langEt').addEventListener('click', () => { S.lang = 'et'; LANG = 'et'; applyLang(); persist(); });
   $('#themeToggle').addEventListener('click', () => { const r = document.documentElement, cur = r.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); const nx = cur === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', nx); try { localStorage.setItem('growlight.theme', nx); } catch (e) {} render(); });
+  $('#palettes').addEventListener('click', (e) => { const b = e.target.closest('button[data-pal]'); if (b) applyPalette(b.dataset.pal, true, true); });
   $('#btnSave').addEventListener('click', () => download((S.project ? S.project.replace(/[^\w-]+/g, '_') + '-' : '') + 'growlight-plan.json', JSON.stringify(serialize(), null, 1), 'application/json'));
   $('#fileLoad').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { try { load(JSON.parse(rd.result)); toast(t('planLoaded')); } catch (err) { toast(t('notPlan')); } }; rd.readAsText(file); e.target.value = ''; });
   $('#btnPng').addEventListener('click', exportPNG); $('#btnCsv').addEventListener('click', exportCSV);
@@ -982,19 +1024,20 @@ function exportCSV() { if (!G) return; const rows = ['x_m,y_m,ppfd,epar,dli,blue
 function exportPNG() {
   if (!G) return; const s = ST, pl = s.pl, W = 1400, pad = 40, mapDestW = W - 2 * pad, mapDestH = Math.round(mapDestW * stage.height / stage.width);
   const cv = document.createElement('canvas'); cv.width = W; cv.height = mapDestH + 320; const c = cv.getContext('2d');
-  c.fillStyle = '#0a1322'; c.fillRect(0, 0, cv.width, cv.height); c.fillStyle = '#e9f3ff'; c.font = '700 28px Sora, system-ui, sans-serif'; c.fillText(S.project ? `${S.project}` : 'Grow Light Planner', pad, 44);
-  c.fillStyle = '#93b1cf'; c.font = '16px Figtree, system-ui, sans-serif'; c.fillText(`${nm(pl)} · ${fmt(S.room.w, 2)} × ${fmt(S.room.l, 2)} m · ${fmt(S.hang, 2)} m · ${S.fixtures.length} × · ${new Date().toLocaleDateString()}`, pad, 72);
+  const bgC = cssVar('--bg'), fgC = cssVar('--fg'), muC = cssVar('--muted');
+  c.fillStyle = bgC; c.fillRect(0, 0, cv.width, cv.height); c.fillStyle = fgC; c.font = '700 28px Sora, system-ui, sans-serif'; c.fillText(S.project ? `${S.project}` : 'Grow Light Planner', pad, 44);
+  c.fillStyle = muC; c.font = '16px Figtree, system-ui, sans-serif'; c.fillText(`${nm(pl)} · ${fmt(S.room.w, 2)} × ${fmt(S.room.l, 2)} m · ${fmt(S.hang, 2)} m · ${S.fixtures.length} × · ${new Date().toLocaleDateString()}`, pad, 72);
   c.drawImage(stage, pad, 90, mapDestW, mapDestH);
   const y = mapDestH + 140;
   const items = [[t('avgU'), fmt(s.avg)], [t('minmax'), `${fmt(s.min)} / ${fmt(s.max)}`], [t('unifU'), fmt(s.unif, 2)], [t('dliU'), `${fmt(s.dli, 1)} @ ${S.hours} h`], [t('covU'), `${fmt(s.inr * 100)} % (${pl.lo}–${pl.hi})`], [t('lampPower'), `${fmt(s.watts)} W · ${fmt(s.eff, 2)} µmol/J`], ['B·G·R·FR', `${fmt(s.fB * 100)}·${fmt(s.fG * 100)}·${fmt(s.fR * 100)}·${fmt(s.fFR * 100)} %`], [t('cost'), `${S.currency} ${fmt(s.kwh * S.price, 2)} · ${S.currency} ${fmt(s.kwh * S.price * 30)}`]];
-  items.forEach(([k, v], i) => { const X = pad + (i % 4) * 330, Y = y + Math.floor(i / 4) * 64; c.fillStyle = '#93b1cf'; c.font = '14px Figtree, system-ui, sans-serif'; c.fillText(k, X, Y); c.fillStyle = '#e9f3ff'; c.font = '700 22px Sora, system-ui, sans-serif'; c.fillText(v, X, Y + 28); });
-  c.fillStyle = '#5c789a'; c.font = '12px Figtree, system-ui, sans-serif'; c.fillText(S.types.map(ty => `${S.fixtures.filter(f => f.t === ty.id).length} × ${ty.name} (${fmt(ty.ppf)} µmol/s, ${ty.watts} W)`).join(' · ') + ` · MF ${fmt(S.mf, 2)}`, pad, cv.height - 22);
+  items.forEach(([k, v], i) => { const X = pad + (i % 4) * 330, Y = y + Math.floor(i / 4) * 64; c.fillStyle = muC; c.font = '14px Figtree, system-ui, sans-serif'; c.fillText(k, X, Y); c.fillStyle = fgC; c.font = '700 22px Sora, system-ui, sans-serif'; c.fillText(v, X, Y + 28); });
+  c.fillStyle = muC; c.font = '12px Figtree, system-ui, sans-serif'; c.fillText(S.types.map(ty => `${S.fixtures.filter(f => f.t === ty.id).length} × ${ty.name} (${fmt(ty.ppf)} µmol/s, ${ty.watts} W)`).join(' · ') + ` · MF ${fmt(S.mf, 2)}`, pad, cv.height - 22);
   cv.toBlob((b) => download('growlight-map.png', b, 'image/png'), 'image/png');
 }
 
 /* ---------------- boot ---------------- */
 function init() {
-  try { const th = localStorage.getItem('growlight.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}
+  try { const pa = localStorage.getItem('growlight.palette'); if (pa) applyPalette(pa, false, false); const th = localStorage.getItem('growlight.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}
   bindStatic(); bindEvents(); recalc();
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => serialize());
 }
