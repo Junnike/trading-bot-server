@@ -119,7 +119,7 @@ canvas.legend{display:block;width:100%;height:46px}
 .speckey i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .fixlist{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto}
 .fixrow{display:grid;grid-template-columns:22px 1fr 64px 64px auto;gap:6px;align-items:center;font-size:12px}
-body.geekmode .fixrow{grid-template-columns:22px 1fr 58px 58px 52px 52px auto}
+body.geekmode .fixrow{grid-template-columns:22px 1fr 54px 54px 46px 46px 46px auto}
 .fixrow input{padding:4px 6px;font-size:12px}
 .fixrow .n{font-weight:700;text-align:center;color:var(--muted)}
 .fixrow .geekcell{display:none}
@@ -166,9 +166,14 @@ details p{margin-top:8px;font-size:12px;color:var(--muted)}
     </div>
     <div class="field"><label for="wall" data-i18n="walls">Walls</label><select id="wall"></select></div>
     <div class="row geek">
-      <div class="field"><label for="refl"><span data-i18n="refl">Wall reflectance</span> <span id="reflVal"></span></label><input type="range" id="refl" min="0" max="0.95" step="0.05"></div>
-      <div class="field"><label for="images" data-i18n="bounces">Reflection bounces</label><select id="images"><option value="0" data-i18n="b0">none</option><option value="1" data-i18n="b1">1 bounce</option><option value="2" data-i18n="b2">2 bounces</option><option value="3" data-i18n="b3">3 bounces (slow)</option></select></div>
+      <div class="field"><label for="reflX"><span data-i18n="reflX">Ends (left / right) reflect</span> <span id="reflXVal"></span></label><input type="range" id="reflX" min="0" max="1" step="0.05"></div>
+      <div class="field"><label for="reflY"><span data-i18n="reflY">Sides (front / back) reflect</span> <span id="reflYVal"></span></label><input type="range" id="reflY" min="0" max="1" step="0.05"></div>
     </div>
+    <div class="row geek">
+      <div class="field"><label for="images" data-i18n="bounces">Reflection bounces</label><select id="images"><option value="0" data-i18n="b0">none</option><option value="1" data-i18n="b1">1 bounce</option><option value="2" data-i18n="b2">2 bounces</option><option value="3" data-i18n="b3">3 bounces (slow)</option></select></div>
+      <div class="field"><label for="margin"><span data-i18n="margin">Canopy margin</span> <span class="unit">cm</span></label><input type="number" id="margin" min="0" max="100" step="1"></div>
+    </div>
+    <p class="hint geek block" data-i18n="shelfHint">For a shelf in a rack set the ends to 100 % (the next block repeats the same lamps) and the sides to 0 % (open). The margin excludes a strip along all four edges from the statistics.</p>
   </section>
 
   <section class="card">
@@ -180,12 +185,19 @@ details p{margin-top:8px;font-size:12px;color:var(--muted)}
     <div id="types"></div>
     <div class="row"><button class="btn" id="btnAddType" type="button" data-i18n="addType">+ Add another lamp type (mix)</button><button class="btn" id="btnSuggest" type="button" data-i18n="suggest">Suggest count</button></div>
     <div class="row" style="justify-content:space-between"><h3 data-i18n="placement">Placement</h3><button class="btn small" id="btnAuto" type="button" data-i18n="auto">Auto layout</button></div>
+    <div class="row geek">
+      <div class="field"><label for="layRows"><span data-i18n="layRows">Rows (along the length)</span></label><input type="number" id="layRows" min="0" max="50" step="1" placeholder="auto"></div>
+      <div class="field"><label for="layCols"><span data-i18n="layCols">Columns (along the width)</span></label><input type="number" id="layCols" min="0" max="50" step="1" placeholder="auto"></div>
+    </div>
     <p class="hint" data-i18n="dragHint">Drag lamps on the map. Positions are the lamp centre, in metres from the bottom-left corner.</p>
     <div class="fixlist" id="fixtures"></div>
   </section>
 
   <section class="card geek block">
     <h2 data-i18n="geekS">Geek settings</h2>
+    <div class="row">
+      <div class="field"><label for="example" data-i18n="exampleL">Load an example</label><select id="example"><option value="">…</option><option value="tent" data-i18n="exTent">Tent 1.2 m, one 630 W bar light</option><option value="shelf" data-i18n="exShelf">Rack shelf 3.7 × 1.08 m, tubes at 35 cm</option></select></div>
+    </div>
     <div class="row">
       <div class="field"><label for="project" data-i18n="project">Project name</label><input type="text" id="project" maxlength="60"></div>
       <div class="field" style="flex:0 0 120px"><label for="tiers" data-i18n="tiers">Identical tiers</label><input type="number" id="tiers" min="1" max="50" step="1"></div>
@@ -194,7 +206,7 @@ details p{margin-top:8px;font-size:12px;color:var(--muted)}
       <div class="field"><label for="mf"><span data-i18n="mf">Maintenance factor</span> <span id="mfVal"></span></label><input type="range" id="mf" min="0.5" max="1" step="0.05"></div>
     </div>
     <div class="row">
-      <div class="field"><label for="gridN"><span data-i18n="gridN">Map resolution</span> <span class="unit" data-i18n="gridNu">points across</span></label><select id="gridN"><option>60</option><option>90</option><option>120</option><option>160</option><option>200</option></select></div>
+      <div class="field"><label for="cell"><span data-i18n="gridN">Map cell size</span> <span class="unit">cm</span></label><select id="cell"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select></div>
       <div class="field"><label for="subN"><span data-i18n="subN">Emitter detail</span> <span class="unit" data-i18n="subNu">points per lamp</span></label><select id="subN"><option>1</option><option>8</option><option>24</option><option>48</option></select></div>
     </div>
     <div class="row">
@@ -305,6 +317,8 @@ const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add
 /* ---------------- languages ---------------- */
 const I18N = {
   en: {
+    vTarget: 'Target fit', vBlue: 'Blue %', vRfr: 'Red : far-red',
+    reflX: 'Ends (left / right) reflect', reflY: 'Sides (front / back) reflect', margin: 'Canopy margin', shelfHint: 'For a shelf in a rack set the ends to 100 % (the next block repeats the same lamps) and the sides to 0 % (open). The margin excludes a strip along all four edges from the statistics.', layRows: 'Rows (along the length)', layCols: 'Columns (along the width)', exampleL: 'Load an example', exTent: 'Tent 1.2 m, one 630 W bar light', exShelf: 'Rack shelf 3.7 × 1.08 m, tubes at 35 cm', wShelf: 'Shelf in a rack: ends continue, sides open', coarse: 'Map made coarser to stay fast', tdir: 'tilt toward, ° (0 = +x, 90 = +y)',
     ofPpf: 'of PPF', noFr: 'no far-red', tiersNote: 'tiers in total: power and cost are multiplied, the map shows one tier.', perDay: 'per day',
     target: 'target', below: 'below', inRange: 'in range', above: 'above', lPpfd: 'PPFD, µmol/m²/s', lDli: 'DLI, mol/m²/day', lBlue: 'Blue share of photons, %', lRfr: 'Red : far-red ratio (capped at 30)',
     secX: 'PPFD across the width, centre line', secY: 'PPFD along the length, centre line', addLamp: 'Add a lamp type to see the map.',
@@ -325,7 +339,7 @@ const I18N = {
     s2: '2 · Ruum või telk', width: 'Laius', length: 'Pikkus', walls: 'Seinad', refl: 'Seinte peegeldus', bounces: 'Peegelduste arv', b0: 'puudub', b1: '1 peegeldus', b2: '2 peegeldust', b3: '3 peegeldust (aeglane)',
     s3: '3 · Valgustid', hang: 'Riputuskõrgus taimede kohal', fit: 'Sobita kõrgus sihile', addType: '+ Lisa teine valgustitüüp (sega)', suggest: 'Soovita kogus', placement: 'Paigutus', auto: 'Automaatpaigutus',
     dragHint: 'Lohista valgusteid kaardil. Asukoht on valgusti kese meetrites alumisest vasakust nurgast.',
-    geekS: 'Nohiku seaded', project: 'Projekti nimi', tiers: 'Ühesuguseid korruseid', mf: 'Hooldetegur (vananemine, tolm)', gridN: 'Kaardi tihedus', gridNu: 'punkti laiuses', subN: 'Kiirguri detailsus', subNu: 'punkti valgusti kohta',
+    geekS: 'Nohiku seaded', project: 'Projekti nimi', tiers: 'Ühesuguseid korruseid', mf: 'Hooldetegur (vananemine, tolm)', gridN: 'Kaardi ruudu suurus', subN: 'Kiirguri detailsus', subNu: 'punkti valgusti kohta',
     ambient: 'Lisanduv päikese DLI', price: 'Elektri hind', perkwh: 'kWh kohta', currency: 'Valuuta', mccree: 'Näita McCree kaaluga saagifootonvoogu (YPFD)',
     lux: 'Luks → PPFD teisendaja', luxIn: 'Luksi näit', luxSrc: 'Valgusallikas', luxHint: 'Luksmeeter kaalub valgust inimsilma järgi, seega tegur sõltub lambi värvist. Need on tüüpilised väärtused, täpsus umbes ±10 %.',
     vTarget: 'Sihi sobivus', vBlue: 'Sinine %', vRfr: 'Punane : sügavpunane', numbers: 'Numbrid',
@@ -348,7 +362,8 @@ const I18N = {
     target: 'siht', below: 'alla', inRange: 'sihis', above: 'üle', lPpfd: 'PPFD, µmol/m²/s', lDli: 'DLI, mol/m²/päev', lBlue: 'Sinise osa footonitest, %', lRfr: 'Punase ja sügavpunase suhe (piir 30)',
     secX: 'PPFD laiuse suunas, keskjoon', secY: 'PPFD pikkuse suunas, keskjoon', addLamp: 'Lisa valgustitüüp, et kaarti näha.', ofPpf: 'PPF-ist', noFr: 'sügavpunane puudub', perDay: 'päevas', tiersNote: 'korrust kokku: võimsus ja kulu on korrutatud, kaart näitab üht korrust.',
     plantInfo: 'Siht {lo}–{hi} µmol/m²/s, DLI {a}–{b} mol/m²/päev {h} tunniga.', co2: 'Üle umbes 1000 µmol/m²/s tasub ära ainult lisatud CO₂-ga.', frNote: 'Sisesta ainult 400–700 nm osa; sügavpunane tuleb spektri eelseadistusest.',
-    wNone: 'Avatud ruum, peegeldus puudub', wDark: 'Tumedad või värvimata seinad', wWhite: 'Valged värvitud seinad', wMylar: 'Kasvutelk / Mylar',
+    wNone: 'Avatud ruum, peegeldus puudub', wDark: 'Tumedad või värvimata seinad', wWhite: 'Valged värvitud seinad', wMylar: 'Kasvutelk / Mylar', wShelf: 'Riiul püstakus: otsad jätkuvad, küljed lahti',
+    reflX: 'Otsad (vasak / parem) peegeldavad', reflY: 'Küljed (ees / taga) peegeldavad', margin: 'Kasvuala serv', shelfHint: 'Püstaku riiuli jaoks sea otsad 100 % (järgmine plokk kordab samu valgusteid) ja küljed 0 % (lahti). Serv jätab statistikast välja riba kõigil neljal küljel.', layRows: 'Ridu (piki pikkust)', layCols: 'Veerge (piki laiust)', exampleL: 'Laadi näide', exTent: 'Telk 1,2 m, üks 630 W latt-valgusti', exShelf: 'Püstaku riiul 3,7 × 1,08 m, torud 35 cm kõrgusel', coarse: 'Kaart tehti kiiruse huvides hõredamaks', tdir: 'kalde suund, ° (0 = +x, 90 = +y)',
     typeNote: 'tüüpiline katteta LED-paneelidele', custom: 'Oma…',
   }
 };
@@ -364,6 +379,7 @@ const SPECTRA = {
   w3500r: { name: 'White 3500 K + 660 nm red', et: 'Valge 3500 K + 660 nm punane', B: .14, G: .37, R: .46, FR: .03 },
   w4000:  { name: 'White 4000 K', et: 'Valge 4000 K', B: .18, G: .42, R: .38, FR: .02 },
   w5000:  { name: 'White 5000 K daylight', et: 'Valge 5000 K päevavalgus', B: .22, G: .43, R: .33, FR: .02 },
+  w6000:  { name: 'White 6000 K', et: 'Valge 6000 K', B: .25, G: .44, R: .29, FR: .02 },
   w6500:  { name: 'White 6500 K cool', et: 'Valge 6500 K külm', B: .26, G: .44, R: .28, FR: .02 },
   rb:     { name: 'Red / blue 5:1 (blurple)', et: 'Punane / sinine 5:1', B: .16, G: .02, R: .80, FR: .02 },
   hps:    { name: 'HPS (high-pressure sodium)', et: 'HPS (naatriumlamp)', B: .05, G: .48, R: .44, FR: .03 },
@@ -372,15 +388,15 @@ const SPECTRA = {
   sun:    { name: 'Sunlight', et: 'Päikesevalgus', B: .22, G: .31, R: .31, FR: .16 },
   custom: { name: 'Custom bands…', et: 'Oma ribad…', B: .15, G: .35, R: .45, FR: .05 },
 };
-const CCT_K = { 2700: 0.0156, 3000: 0.0152, 3500: 0.0146, 4000: 0.0141, 5000: 0.0135, 6500: 0.0130 };   // µmol/s per lumen, white LED
-const CCT_SPEC = { 2700: 'w2700', 3000: 'w3000', 3500: 'w3500r', 4000: 'w4000', 5000: 'w5000', 6500: 'w6500' };
+const CCT_K = { 2700: 0.0140, 3000: 0.0137, 3500: 0.0136, 4000: 0.0135, 5000: 0.0132, 6000: 0.0131, 6500: 0.0130 };   // µmol/s per lumen, white LED, CRI 80 (CRI 90 gives ~8 % more photons per lumen)
+const CCT_SPEC = { 2700: 'w2700', 3000: 'w3000', 3500: 'w3500r', 4000: 'w4000', 5000: 'w5000', 6000: 'w6000', 6500: 'w6500' };
 const FIXTURES = [
   { id: 'board100', name: 'LED board 100 W (3000 K + 660 nm)', et: 'LED-paneel 100 W (3000 K + 660 nm)', ppf: 270, watts: 100, beam: 120, len: 0.5, wid: 0.3, spec: 'w3000r' },
   { id: 'board240', name: 'LED board 240 W (3500 K + 660 nm)', et: 'LED-paneel 240 W (3500 K + 660 nm)', ppf: 650, watts: 240, beam: 120, len: 0.6, wid: 0.55, spec: 'w3500r' },
   { id: 'bar630',   name: 'LED 6-bar 630 W top light', et: 'LED 6 latiga 630 W pealtvalgusti', ppf: 1800, watts: 630, beam: 120, len: 1.1, wid: 1.05, spec: 'w3000r' },
   { id: 'bar1000',  name: 'LED 8-bar 1000 W top light', et: 'LED 8 latiga 1000 W pealtvalgusti', ppf: 2900, watts: 1000, beam: 120, len: 1.2, wid: 1.1, spec: 'w3000r' },
   { id: 'strip150', name: 'LED bar 1.2 m, 150 W', et: 'LED-latt 1,2 m, 150 W', ppf: 420, watts: 150, beam: 120, len: 1.2, wid: 0.06, spec: 'w4000' },
-  { id: 'triproof', name: 'Tri-proof tube 36 W, 6000 K (1.2 m)', et: 'Tri-proof toru 36 W, 6000 K (1,2 m)', mode: 'lm', lm: 6840, cct: 6500, watts: 36, beam: 175, beam90: 120, len: 1.23, wid: 0.07, spec: 'w6500' },
+  { id: 'triproof', name: 'Tri-proof tube 36 W, 6000 K (1.2 m)', et: 'Tri-proof toru 36 W, 6000 K (1,2 m)', mode: 'lm', lm: 6840, cct: 6000, watts: 36, beam: 175, beam90: 120, len: 1.23, wid: 0.07, spec: 'w6000' },
   { id: 't8',       name: 'T8 LED tube 25 W, 3000 K (1.5 m)', et: 'T8 LED-toru 25 W, 3000 K (1,5 m)', mode: 'lm', lm: 3500, cct: 3000, watts: 25, beam: 120, len: 1.5, wid: 0.03, spec: 'w3000' },
   { id: 'ghtop',    name: 'Greenhouse top light 1000 W (compact)', et: 'Kasvuhoone pealtvalgusti 1000 W', ppf: 2800, watts: 1000, beam: 120, len: 1.0, wid: 0.35, spec: 'w3000r' },
   { id: 'hps1000',  name: 'HPS 1000 W DE with reflector', et: 'HPS 1000 W DE reflektoriga', ppf: 2100, watts: 1060, beam: 100, len: 0.5, wid: 0.3, spec: 'hps' },
@@ -407,13 +423,14 @@ const PLANTS = [
   { id: 'custom', name: 'Custom target…', et: 'Oma sihtväärtus…', lo: 300, hi: 600, dli: [15, 30], hours: 16 },
 ];
 const WALLS = [
-  { id: 'none', name: 'Open space, no reflection', k: 'wNone', r: 0 },
-  { id: 'dark', name: 'Dark or unpainted walls', k: 'wDark', r: 0.3 },
-  { id: 'white', name: 'White painted walls', k: 'wWhite', r: 0.75 },
-  { id: 'mylar', name: 'Grow tent / Mylar', k: 'wMylar', r: 0.9 },
+  { id: 'none', name: 'Open space, no reflection', k: 'wNone', rx: 0, ry: 0 },
+  { id: 'dark', name: 'Dark or unpainted walls', k: 'wDark', rx: 0.3, ry: 0.3 },
+  { id: 'white', name: 'White painted walls', k: 'wWhite', rx: 0.75, ry: 0.75 },
+  { id: 'mylar', name: 'Grow tent / Mylar', k: 'wMylar', rx: 0.9, ry: 0.9 },
+  { id: 'shelf', name: 'Shelf in a rack: ends continue, sides open', k: 'wShelf', rx: 1, ry: 0 },
 ];
 const MCCREE = { B: .73, G: .86, R: .97, FR: .30 };
-const LUX = [{ n: 'Sunlight', et: 'Päikesevalgus', f: 54 }, { n: 'HPS', f: 82 }, { n: 'Metal halide', et: 'Metallhaliid', f: 71 }, { n: 'CMH', f: 68 }, { n: 'White LED 3000 K', et: 'Valge LED 3000 K', f: 66 }, { n: 'White LED 4000 K', et: 'Valge LED 4000 K', f: 71 }, { n: 'White LED 5000 K', et: 'Valge LED 5000 K', f: 74 }, { n: 'Red/blue LED (very approximate)', et: 'Punane/sinine LED (väga umbkaudne)', f: 25 }];
+const LUX = [{ n: 'Sunlight', et: 'Päikesevalgus', f: 54 }, { n: 'HPS', f: 82 }, { n: 'Metal halide', et: 'Metallhaliid', f: 71 }, { n: 'CMH', f: 68 }, { n: 'White LED 3000 K (CRI 80)', et: 'Valge LED 3000 K (CRI 80)', f: 73 }, { n: 'White LED 4000 K (CRI 80)', et: 'Valge LED 4000 K (CRI 80)', f: 74 }, { n: 'White LED 5000–6500 K (CRI 80)', et: 'Valge LED 5000–6500 K (CRI 80)', f: 76 }, { n: 'White LED 3000 K (CRI 90)', et: 'Valge LED 3000 K (CRI 90)', f: 65 }, { n: 'Red/blue LED (very approximate)', et: 'Punane/sinine LED (väga umbkaudne)', f: 25 }];
 const TYPE_COLORS = ['#8be4ff', '#ffcf6b', '#ff8fb3', '#5ce8a6', '#c7a8ff', '#ffb27a'];
 
 /* ---------------- state ---------------- */
@@ -425,8 +442,8 @@ function mkType(p) {
 function resolvePPF(t) { if (t.mode === 'lm') t.ppf = Math.round((+t.lm || 0) * (CCT_K[t.cct] || 0.0145)); else if (t.mode === 'eff') t.ppf = Math.round((+t.effIn || 0) * (+t.watts || 0)); }
 function defaultState() {
   const t = mkType(FIXTURES[2]);
-  return { version: 2, lang: 'en', plant: 'cannabis_flower', hours: 12, custLo: 300, custHi: 600, room: { w: 1.2, l: 1.2 }, wall: 'mylar', refl: 0.9, images: 2, hang: 0.45, mf: 0.9, tiers: 1, project: '',
-    types: [t], fixtures: [{ t: t.id, x: 0.6, y: 0.6, rot: 0, tilt: 0, tdir: 0 }], geek: false, gridN: 120, subN: 24, ambient: 0, price: 0.2, currency: '€', view: 'ppfd', numbers: false, mccree: false };
+  return { version: 2, lang: 'en', plant: 'cannabis_flower', hours: 12, custLo: 300, custHi: 600, room: { w: 1.2, l: 1.2 }, wall: 'mylar', reflX: 0.9, reflY: 0.9, images: 2, hang: 0.45, mf: 0.9, tiers: 1, project: '', margin: 0, layRows: 0, layCols: 0,
+    types: [t], fixtures: [{ t: t.id, x: 0.6, y: 0.6, rot: 0, tilt: 0, tdir: 0 }], geek: false, cell: 2, subN: 24, ambient: 0, price: 0.2, currency: '€', view: 'ppfd', numbers: false, mccree: false };
 }
 let S = defaultState();
 let G = null, M = null, ST = null, sel = -1, dragging = null;
@@ -518,7 +535,7 @@ function buildSources(type, H, room, K, subN) {
   const spacing = Math.max(0.05, H / 3);
   let nu = clamp(Math.ceil(len / spacing), 1, 8), nv = clamp(Math.ceil(wid / spacing), 1, 6);
   while (nu * nv > subN) { if (nu >= nv && nu > 1) nu--; else if (nv > 1) nv--; else break; }
-  const w0 = 1 / (nu * nv), rho = S.refl;
+  const w0 = 1 / (nu * nv), rx = clamp(+S.reflX || 0, 0, 1), ry = clamp(+S.reflY || 0, 0, 1);
   for (const f of S.fixtures) {
     if (f.t !== type.id) continue;
     const tau = (f.tilt || 0) * DEG, az = (f.tdir || 0) * DEG, rot = (f.rot || 0) * DEG;
@@ -527,7 +544,7 @@ function buildSources(type, H, room, K, subN) {
     tv = [tv[0] - dn * n[0], tv[1] - dn * n[1], tv[2] - dn * n[2]]; const tl = Math.hypot(tv[0], tv[1], tv[2]) || 1; tv = tv.map(v => v / tl);
     for (let m = -K; m <= K; m++) for (let q = -K; q <= K; q++) {
       if (Math.abs(m) + Math.abs(q) > K) continue;
-      const w = w0 * Math.pow(rho, Math.abs(m) + Math.abs(q)); if (w <= 1e-6) continue;
+      const w = w0 * Math.pow(rx, Math.abs(m)) * Math.pow(ry, Math.abs(q)); if (w <= 1e-6) continue;
       const fx = m % 2 === 0 ? 1 : -1, fy = q % 2 === 0 ? 1 : -1;
       const cx = m % 2 === 0 ? f.x + m * room.w : -f.x + (m + 1) * room.w;
       const cy = q % 2 === 0 ? f.y + q * room.l : -f.y + (q + 1) * room.l;
@@ -541,12 +558,21 @@ function buildSources(type, H, room, K, subN) {
   }
   return new Float32Array(out);
 }
-function computeGrids(nx) {
-  const W = S.room.w, L = S.room.l; const ny = Math.max(2, Math.round(nx * L / W)); const dx = W / nx, dy = L / ny;
+function gridDims(cellCm) {
+  const W = S.room.w, L = S.room.l; let cell = Math.max(0.5, +cellCm || 2) / 100;
+  let nx = clamp(Math.round(W / cell), 20, 900), ny = clamp(Math.round(L / cell), 20, 900);
+  const srcs = S.types.map(ty => buildSources(ty, S.hang, S.room, S.images, S.subN)); const ns = srcs.reduce((a, s) => a + s.length / 13, 0);
+  let coarse = false;
+  while (nx * ny * Math.max(1, ns) > 140e6 && (nx > 20 || ny > 20)) { cell *= 1.5; nx = clamp(Math.round(W / cell), 20, 900); ny = clamp(Math.round(L / cell), 20, 900); coarse = true; }
+  return { nx, ny, srcs, coarse };
+}
+function computeGrids(cellCm) {
+  const W = S.room.w, L = S.room.l; const { nx, ny, srcs, coarse } = gridDims(cellCm); const dx = W / nx, dy = L / ny;
+  if (coarse && cellCm === +S.cell && !computeGrids.warned) { computeGrids.warned = true; toast(t('coarse')); }
   const grids = S.types.map(() => new Float32Array(nx * ny));
   S.types.forEach((type, ti) => {
     let dist; try { dist = getDist(type); } catch (e) { dist = beamLUT(type.beam); }
-    const src = buildSources(type, S.hang, S.room, S.images, S.subN), g = grids[ti];
+    const src = srcs[ti], g = grids[ti];
     const lut = dist.lut, NL = dist.N, phi = dist.phi, NH = dist.NH, along = dist.along, ns = src.length / 13, hstep = 360 / NH;
     for (let j = 0; j < ny; j++) {
       const y = (j + 0.5) * dy;
@@ -582,9 +608,10 @@ function deriveMaps(G) {
 }
 function plant() { const p = PLANTS.find(p => p.id === S.plant) || PLANTS[0]; return p.id === 'custom' ? { ...p, lo: +S.custLo, hi: +S.custHi } : p; }
 function stats(G, M) {
-  const n = M.ppfd.length, pl = plant(); let sum = 0, min = Infinity, max = -Infinity, sq = 0, inr = 0, below = 0, above = 0, sB = 0, sG = 0, sR = 0, sFR = 0, sE = 0;
-  for (let k = 0; k < n; k++) { const v = M.ppfd[k]; sum += v; sq += v * v; if (v < min) min = v; if (v > max) max = v; if (v < pl.lo) below++; else if (v > pl.hi) above++; else inr++; sB += M.B[k]; sG += M.G[k]; sR += M.R[k]; sFR += M.FR[k]; sE += M.epar[k]; }
-  const avg = sum / n, sd = Math.sqrt(Math.max(0, sq / n - avg * avg)), area = S.room.w * S.room.l, tiers = clamp(Math.round(+S.tiers) || 1, 1, 50);
+  const pl = plant(), mg = clamp(+S.margin || 0, 0, 100) / 100; let n = 0, sum = 0, min = Infinity, max = -Infinity, sq = 0, inr = 0, below = 0, above = 0, sB = 0, sG = 0, sR = 0, sFR = 0, sE = 0;
+  const i0 = Math.min(G.nx - 1, Math.floor(mg / G.dx)), i1 = Math.max(i0, G.nx - 1 - i0), j0 = Math.min(G.ny - 1, Math.floor(mg / G.dy)), j1 = Math.max(j0, G.ny - 1 - j0);
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const k = j * G.nx + i, v = M.ppfd[k]; n++; sum += v; sq += v * v; if (v < min) min = v; if (v > max) max = v; if (v < pl.lo) below++; else if (v > pl.hi) above++; else inr++; sB += M.B[k]; sG += M.G[k]; sR += M.R[k]; sFR += M.FR[k]; sE += M.epar[k]; }
+  const avg = sum / n, sd = Math.sqrt(Math.max(0, sq / n - avg * avg)), area = Math.max(0.01, S.room.w - 2 * mg) * Math.max(0.01, S.room.l - 2 * mg), tiers = clamp(Math.round(+S.tiers) || 1, 1, 50);
   const ppfTotal = S.fixtures.reduce((a, f) => { const t = S.types.find(t => t.id === f.t); return a + (t ? +t.ppf || 0 : 0); }, 0) * clamp(+S.mf || 1, 0.1, 1);
   const watts = S.fixtures.reduce((a, f) => { const t = S.types.find(t => t.id === f.t); return a + (t ? +t.watts || 0 : 0); }, 0);
   const eparAvg = sE / n, tb = sB + sG + sR + sFR || 1;
@@ -595,7 +622,7 @@ function stats(G, M) {
 }
 function recalc(full = true) {
   if (!S.types.length) { G = null; M = null; ST = null; render(); return; }
-  G = computeGrids(full ? +S.gridN : 40); M = deriveMaps(G); ST = stats(G, M); render(); updateResults(); persist();
+  G = computeGrids(full ? +S.cell : Math.max(+S.cell * 3, 4)); M = deriveMaps(G); ST = stats(G, M); render(); updateResults(); persist();
 }
 
 /* ---------------- colour maps ---------------- */
@@ -658,6 +685,7 @@ function render() {
       ctx.fillStyle = 'rgba(0,0,0,0.45)'; const tw = ctx.measureText(s).width + 6 * g.dpr; ctx.fillRect(X - tw / 2, Y - 7 * g.dpr, tw, 14 * g.dpr); ctx.fillStyle = '#fff'; ctx.fillText(s, X, Y);
     }
   }
+  if (+S.margin > 0) { const mg = +S.margin / 100 * ppm; ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1 * g.dpr; ctx.setLineDash([4 * g.dpr, 4 * g.dpr]); ctx.strokeRect(pad + mg, pad + mg, mapW - 2 * mg, mapH - 2 * mg); ctx.setLineDash([]); }
   S.fixtures.forEach((f, idx) => {
     const ty = S.types.find(t => t.id === f.t); if (!ty) return; const ti = S.types.indexOf(ty), c = TYPE_COLORS[ti % TYPE_COLORS.length];
     const X = pad + f.x * ppm, Y = pad + mapH - f.y * ppm, L = Math.max(0.05, ty.len) * ppm, Wd = Math.max(0.03, ty.wid) * ppm;
@@ -774,14 +802,15 @@ function renderFixtures() {
     const ty = S.types.find(t => t.id === f.t), ti = Math.max(0, S.types.indexOf(ty)), el = document.createElement('div'); el.className = 'fixrow' + (i === sel ? ' sel' : ''); el.dataset.i = i;
     el.innerHTML = `<span class="n" style="color:${i === sel ? TYPE_COLORS[ti % TYPE_COLORS.length] : ''}">${i + 1}</span><span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ty ? ty.name : '?'}</span>
       <input type="number" data-f="x" step="0.05" value="${(+f.x).toFixed(2)}" aria-label="x, m"><input type="number" data-f="y" step="0.05" value="${(+f.y).toFixed(2)}" aria-label="y, m">
-      <input class="geekcell" type="number" data-f="rot" step="15" value="${f.rot || 0}" aria-label="rotation, degrees" title="Rotation °"><input class="geekcell" type="number" data-f="tilt" step="5" min="0" max="60" value="${f.tilt || 0}" aria-label="tilt, degrees" title="Tilt from vertical °">
+      <input class="geekcell" type="number" data-f="rot" step="15" value="${f.rot || 0}" aria-label="rotation, degrees" title="Rotation °"><input class="geekcell" type="number" data-f="tilt" step="5" min="0" max="60" value="${f.tilt || 0}" aria-label="tilt, degrees" title="Tilt from vertical °"><input class="geekcell" type="number" data-f="tdir" step="90" value="${f.tdir || 0}" aria-label="tilt direction, degrees" title="${t('tdir')}">
       <button class="btn small ghost danger" data-act="del" type="button" aria-label="Remove lamp ${i + 1}">×</button>`;
     box.appendChild(el);
   });
 }
 function autoLayout() {
   const n = S.fixtures.length; if (!n) return; const W = S.room.w, L = S.room.l;
-  const cols = clamp(Math.round(Math.sqrt(n * W / L)) || 1, 1, n), rows = Math.ceil(n / cols);
+  let cols = clamp(Math.round(Math.sqrt(n * W / L)) || 1, 1, n), rows = Math.ceil(n / cols);
+  if (+S.layRows > 0 && +S.layCols > 0) { rows = clamp(Math.round(+S.layRows), 1, 50); cols = clamp(Math.round(+S.layCols), 1, 50); if (rows * cols < n) rows = Math.ceil(n / cols); }
   let k = 0; for (let r = 0; r < rows; r++) { const inRow = Math.min(cols, n - r * cols); for (let c = 0; c < inRow; c++) { const f = S.fixtures[k++]; f.x = +((c + 0.5) * W / inRow).toFixed(3); f.y = +((r + 0.5) * L / rows).toFixed(3); } }
 }
 function setCount(ty, count) {
@@ -792,17 +821,34 @@ function setCount(ty, count) {
 }
 function suggestCount() {
   const ty = S.types[0]; if (!ty || !(+ty.ppf > 0)) return; const pl = plant(), target = (pl.lo + pl.hi) / 2, area = S.room.w * S.room.l;
-  const capture = (0.55 + 0.4 * S.refl) * (+S.mf || 1); let n = clamp(Math.round(target * area / (+ty.ppf * capture)), 1, 200);
+  const capture = (0.55 + 0.2 * (S.reflX + S.reflY)) * (+S.mf || 1); let n = clamp(Math.round(target * area / (+ty.ppf * capture)), 1, 200);
   S.fixtures = S.fixtures.filter(f => f.t === ty.id); setCount(ty, n); recalc();
   for (let i = 0; i < 4 && ST; i++) { if (ST.avg < pl.lo && n < 200) { n++; setCount(ty, n); recalc(); } else if (ST.avg > pl.hi && n > 1) { n--; setCount(ty, n); recalc(); } else break; }
   renderTypes(); renderFixtures(); toast(`${n} × ${nm(ty)}`);
 }
 function fitHeight() {
   const pl = plant(), target = (pl.lo + pl.hi) / 2; let lo = 0.05, hi = 6;
-  const avgAt = (h) => { S.hang = h; const g = computeGrids(40), m = deriveMaps(g); let s = 0; for (let k = 0; k < m.ppfd.length; k++) s += m.ppfd[k]; return s / m.ppfd.length; };
+  const avgAt = (h) => { S.hang = h; const g = computeGrids(Math.max(+S.cell * 3, 4)), m = deriveMaps(g); return stats(g, m).avg; };
   if (avgAt(lo) < target) { S.hang = 0.1; toast(t('fitLow')); } else if (avgAt(hi) > target) { S.hang = hi; toast(t('fitHigh')); }
   else { for (let i = 0; i < 22; i++) { const mid = (lo + hi) / 2; if (avgAt(mid) > target) lo = mid; else hi = mid; } S.hang = Math.round((lo + hi) / 2 * 100) / 100; toast(`${t('fitSet')} ${S.hang.toFixed(2)} m`); }
   $('#hang').value = S.hang; recalc();
+}
+
+function loadExample(which) {
+  const lang = S.lang, geek = S.geek; S = defaultState(); S.lang = lang; S.geek = geek; sel = -1; distCache.clear();
+  if (which === 'shelf') {
+    // One 3.7 × 1.08 m shelf of a continuous rack, as in a typical vertical-farm offer: 5 rows of 150 cm tubes at 35 cm, growing area 370 × 88 cm.
+    S.plant = 'custom'; S.custLo = 250; S.custHi = 400; S.hours = 16; S.room = { w: 3.7, l: 1.08 }; S.wall = 'shelf'; S.reflX = 1; S.reflY = 0; S.images = 2; S.hang = 0.35; S.margin = 10; S.cell = 2; S.project = 'Rack shelf, block of 3.7 m';
+    const tp = mkType(FIXTURES.find(p => p.id === 'triproof')); Object.assign(tp, { name: 'Tri-proof 150 cm, 50 W, 6000 K, 190 lm/W', lm: 9500, watts: 50, len: 1.5, wid: 0.07 }); resolvePPF(tp);
+    const t8 = mkType(FIXTURES.find(p => p.id === 't8')); Object.assign(t8, { name: 'T8 tube 150 cm, 25 W, 6000 K, 170 lm/W, in housing', lm: 4250, cct: 6000, spec: 'w6000', bands: { ...SPECTRA.w6000 }, watts: 25, beam: 150, beam90: 120, len: 1.5, wid: 0.03 }); resolvePPF(t8);
+    const red = mkType(FIXTURES.find(p => p.id === 'custom')); Object.assign(red, { name: '660 nm LED modules on the housing, 23 W (2.5 µmol/J)', mode: 'ppf', ppf: 58, watts: 23, beam: 120, beam90: 0, len: 1.5, wid: 0.03, spec: 'custom', bands: { B: 0, G: 0, R: .98, FR: .02 } });
+    S.types = [tp, t8, red]; S.fixtures = [];
+    for (const x of [0.925, 2.775]) {
+      S.fixtures.push({ t: t8.id, x, y: 0.14, rot: 0, tilt: 0, tdir: 0 }, { t: tp.id, x, y: 0.25, rot: 0, tilt: 10, tdir: 270 }, { t: t8.id, x, y: 0.54, rot: 0, tilt: 0, tdir: 0 }, { t: tp.id, x, y: 0.83, rot: 0, tilt: 10, tdir: 90 }, { t: t8.id, x, y: 0.94, rot: 0, tilt: 0, tdir: 0 });
+      S.fixtures.push({ t: red.id, x, y: 0.14, rot: 0, tilt: 0, tdir: 0 }, { t: red.id, x, y: 0.54, rot: 0, tilt: 0, tdir: 0 }, { t: red.id, x, y: 0.94, rot: 0, tilt: 0, tdir: 0 });
+    }
+  }
+  bindStatic(); recalc(); toast(t('exampleLoaded'));
 }
 
 /* ---------------- language ---------------- */
@@ -818,10 +864,10 @@ function plantInfo() { const pl = plant(); $('#plantInfo').textContent = t('plan
 /* ---------------- events ---------------- */
 function bindStatic() {
   const set = (id, v) => { const e = $('#' + id); if (e) e.value = v; };
-  set('hours', S.hours); set('custLo', S.custLo); set('custHi', S.custHi); set('roomW', S.room.w); set('roomL', S.room.l); set('refl', S.refl); set('images', S.images); set('hang', S.hang);
-  set('gridN', S.gridN); set('subN', S.subN); set('ambient', S.ambient); set('price', S.price); set('currency', S.currency); set('project', S.project || ''); set('tiers', S.tiers || 1); set('mf', S.mf == null ? 0.9 : S.mf);
+  set('hours', S.hours); set('custLo', S.custLo); set('custHi', S.custHi); set('roomW', S.room.w); set('roomL', S.room.l); set('reflX', S.reflX); set('reflY', S.reflY); set('images', S.images); set('hang', S.hang); set('margin', S.margin || 0); set('layRows', S.layRows || ''); set('layCols', S.layCols || ''); set('example', '');
+  set('cell', S.cell); set('subN', S.subN); set('ambient', S.ambient); set('price', S.price); set('currency', S.currency); set('project', S.project || ''); set('tiers', S.tiers || 1); set('mf', S.mf == null ? 0.9 : S.mf);
   $('#geek').checked = !!S.geek; document.body.classList.toggle('geekmode', !!S.geek); $('#numbers').checked = !!S.numbers; $('#mccree').checked = !!S.mccree;
-  $('#reflVal').textContent = Math.round(S.refl * 100) + ' %'; $('#mfVal').textContent = fmt(S.mf, 2); $('#custWrap').hidden = S.plant !== 'custom';
+  $('#reflXVal').textContent = Math.round(S.reflX * 100) + ' %'; $('#reflYVal').textContent = Math.round(S.reflY * 100) + ' %'; $('#mfVal').textContent = fmt(S.mf, 2); $('#custWrap').hidden = S.plant !== 'custom';
   $$('#views .tab').forEach(b => b.setAttribute('aria-selected', b.dataset.view === S.view ? 'true' : 'false'));
   LANG = S.lang === 'et' ? 'et' : 'en'; applyLang();
 }
@@ -833,13 +879,17 @@ function onInput(e) {
   else if (id === 'custLo') S.custLo = num(el.value, 300); else if (id === 'custHi') S.custHi = num(el.value, 600);
   else if (id === 'roomW') { S.room.w = clamp(num(el.value, 1), 0.2, 30); autoLayout(); renderFixtures(); }
   else if (id === 'roomL') { S.room.l = clamp(num(el.value, 1), 0.2, 30); autoLayout(); renderFixtures(); }
-  else if (id === 'wall') { S.wall = el.value; S.refl = WALLS.find(w => w.id === S.wall).r; $('#refl').value = S.refl; $('#reflVal').textContent = Math.round(S.refl * 100) + ' %'; }
-  else if (id === 'refl') { S.refl = num(el.value, 0.7); $('#reflVal').textContent = Math.round(S.refl * 100) + ' %'; }
+  else if (id === 'wall') { S.wall = el.value; const w = WALLS.find(w => w.id === S.wall); S.reflX = w.rx; S.reflY = w.ry; $('#reflX').value = w.rx; $('#reflY').value = w.ry; $('#reflXVal').textContent = Math.round(w.rx * 100) + ' %'; $('#reflYVal').textContent = Math.round(w.ry * 100) + ' %'; }
+  else if (id === 'reflX') { S.reflX = clamp(num(el.value, 0.7), 0, 1); $('#reflXVal').textContent = Math.round(S.reflX * 100) + ' %'; }
+  else if (id === 'reflY') { S.reflY = clamp(num(el.value, 0.7), 0, 1); $('#reflYVal').textContent = Math.round(S.reflY * 100) + ' %'; }
+  else if (id === 'margin') S.margin = clamp(num(el.value, 0), 0, 100);
+  else if (id === 'layRows' || id === 'layCols') { S[id] = clamp(Math.round(num(el.value, 0)), 0, 50); autoLayout(); renderFixtures(); }
+  else if (id === 'example') { if (el.value) { loadExample(el.value); } return; }
   else if (id === 'mf') { S.mf = clamp(num(el.value, 0.9), 0.5, 1); $('#mfVal').textContent = fmt(S.mf, 2); }
   else if (id === 'tiers') { S.tiers = clamp(Math.round(num(el.value, 1)), 1, 50); updateResults(); persist(); return; }
   else if (id === 'project') { S.project = el.value; persist(); return; }
   else if (id === 'images') S.images = +el.value; else if (id === 'hang') S.hang = clamp(num(el.value, 0.5), 0.05, 10);
-  else if (id === 'gridN') S.gridN = +el.value; else if (id === 'subN') S.subN = +el.value; else if (id === 'ambient') S.ambient = clamp(num(el.value, 0), 0, 80);
+  else if (id === 'cell') { S.cell = +el.value; computeGrids.warned = false; } else if (id === 'subN') S.subN = +el.value; else if (id === 'ambient') S.ambient = clamp(num(el.value, 0), 0, 80);
   else if (id === 'price') { S.price = Math.max(0, num(el.value, 0.2)); updateResults(); persist(); return; } else if (id === 'currency') { S.currency = el.value; updateResults(); persist(); return; }
   else if (id === 'geek') { S.geek = el.checked; document.body.classList.toggle('geekmode', S.geek); render(); persist(); return; }
   else if (id === 'numbers') { S.numbers = el.checked; render(); persist(); return; } else if (id === 'mccree') { S.mccree = el.checked; updateResults(); persist(); return; }
@@ -867,7 +917,7 @@ function onTypeClick(e) {
   renderTypes(); renderFixtures(); recalc();
 }
 function onFixInput(e) { const row = e.target.closest('.fixrow'); if (!row) return; const f = S.fixtures[+row.dataset.i]; if (!f) return; const k = e.target.dataset.f, x = parseFloat(e.target.value); if (!isFinite(x)) return;
-  if (k === 'x') f.x = clamp(x, 0, S.room.w); else if (k === 'y') f.y = clamp(x, 0, S.room.l); else if (k === 'rot') f.rot = x; else if (k === 'tilt') { f.tilt = clamp(x, 0, 60); f.tdir = f.rot || 0; } recalc(); }
+  if (k === 'x') f.x = clamp(x, 0, S.room.w); else if (k === 'y') f.y = clamp(x, 0, S.room.l); else if (k === 'rot') f.rot = x; else if (k === 'tilt') f.tilt = clamp(x, 0, 60); else if (k === 'tdir') f.tdir = x; recalc(); }
 function onFixClick(e) { const btn = e.target.closest('button[data-act="del"]'); const row = e.target.closest('.fixrow'); if (!row) return; const i = +row.dataset.i;
   if (btn) { S.fixtures.splice(i, 1); sel = -1; renderTypes(); renderFixtures(); recalc(); } else { sel = i; renderFixtures(); render(); } }
 function canvasToRoom(ev) { const r = stage.getBoundingClientRect(), g = render.g, dpr = g.dpr; const X = (ev.clientX - r.left) * dpr, Y = (ev.clientY - r.top) * dpr; return { x: (X - g.pad) / g.ppm, y: (g.pad + g.mapH - Y) / g.ppm }; }
@@ -883,7 +933,7 @@ function bindEvents() {
   $('#btnAddType').addEventListener('click', () => { const p = FIXTURES[S.types.length % 2 ? 0 : 11]; const ty = mkType(p); S.types.push(ty); S.fixtures.push({ t: ty.id, x: S.room.w / 2, y: S.room.l / 2, rot: 0, tilt: 0, tdir: 0 }); autoLayout(); renderTypes(); renderFixtures(); recalc(); });
   $('#btnAuto').addEventListener('click', () => { autoLayout(); renderFixtures(); recalc(); }); $('#btnSuggest').addEventListener('click', suggestCount); $('#btnFit').addEventListener('click', fitHeight);
   $('#views').addEventListener('click', (e) => { const b = e.target.closest('.tab'); if (!b) return; S.view = b.dataset.view; $$('#views .tab').forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false')); render(); persist(); });
-  $('#btnExample').addEventListener('click', () => { const lang = S.lang; S = defaultState(); S.lang = lang; sel = -1; bindStatic(); recalc(); toast(t('exampleLoaded')); });
+  $('#btnExample').addEventListener('click', () => loadExample('tent'));
   $('#langEn').addEventListener('click', () => { S.lang = 'en'; LANG = 'en'; applyLang(); persist(); }); $('#langEt').addEventListener('click', () => { S.lang = 'et'; LANG = 'et'; applyLang(); persist(); });
   $('#themeToggle').addEventListener('click', () => { const r = document.documentElement, cur = r.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); const nx = cur === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', nx); try { localStorage.setItem('growlight.theme', nx); } catch (e) {} render(); });
   $('#btnSave').addEventListener('click', () => download((S.project ? S.project.replace(/[^\w-]+/g, '_') + '-' : '') + 'growlight-plan.json', JSON.stringify(serialize(), null, 1), 'application/json'));
@@ -901,11 +951,12 @@ function bindEvents() {
 function serialize() { return JSON.parse(JSON.stringify({ ...S, types: S.types.map(ty => ({ ...ty, ies: ty.ies ? { name: ty.ies.name, V: ty.ies.V, H: ty.ies.H, C: ty.ies.C, mode: ty.ies.mode } : null })) })); }
 function normalize(data) {
   S = { ...defaultState(), ...data }; S.room = { ...defaultState().room, ...(data.room || {}) };
+  if (S.reflX == null) { const r = data.refl != null ? +data.refl : 0.9; S.reflX = r; S.reflY = r; } if (!S.cell) S.cell = 2;
   S.types.forEach(ty => { if (!ty.bands) ty.bands = { ...SPECTRA[ty.spec] || SPECTRA.custom }; if (!ty.mode) ty.mode = 'ppf'; if (ty.beam90 == null) ty.beam90 = 0; const n = parseInt(String(ty.id).slice(1)); if (n >= uid) uid = n + 1; });
   S.fixtures = (S.fixtures || []).filter(f => S.types.some(t => t.id === f.t)); sel = -1;
 }
 function load(data) { if (!data || !data.types) throw new Error('bad'); normalize(data); bindStatic(); recalc(); }
-function persist() { try { localStorage.setItem('growlight.v2', JSON.stringify(serialize())); } catch (e) {} }
+function persist() { try { localStorage.setItem('growlight.v3', JSON.stringify(serialize())); } catch (e) {} }
 function download(name, content, type) { try { const blob = content instanceof Blob ? content : new Blob([content], { type }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast(`${t('saved')} ${name}`); } catch (e) { toast(t('dlBlocked')); } }
 function exportCSV() { if (!G) return; const rows = ['x_m,y_m,ppfd,epar,dli,blue_pct,rfr']; for (let j = 0; j < G.ny; j++) for (let i = 0; i < G.nx; i++) { const k = j * G.nx + i; rows.push(`${((i + 0.5) * G.dx).toFixed(3)},${((j + 0.5) * G.dy).toFixed(3)},${M.ppfd[k].toFixed(1)},${M.epar[k].toFixed(1)},${(M.ppfd[k] * S.hours * 0.0036 + +S.ambient).toFixed(2)},${(M.epar[k] > 0 ? 100 * M.B[k] / M.epar[k] : 0).toFixed(1)},${(M.FR[k] > 0 ? M.R[k] / M.FR[k] : 0).toFixed(2)}`); } download('growlight-ppfd-grid.csv', rows.join('\n'), 'text/csv'); }
 function exportPNG() {
@@ -930,7 +981,7 @@ function init() {
 function start(data) {
   let loaded = false;
   if (data && data.types) { try { normalize(data); loaded = true; } catch (e) {} }
-  if (!loaded) { try { const raw = localStorage.getItem('growlight.v2'); if (raw) { const d = JSON.parse(raw); if (d && d.types && d.fixtures) { normalize(d); loaded = true; } } } catch (e) {} }
+  if (!loaded) { try { const raw = localStorage.getItem('growlight.v3'); if (raw) { const d = JSON.parse(raw); if (d && d.types && d.fixtures) { normalize(d); loaded = true; } } } catch (e) {} }
   if (!loaded) { try { if ((navigator.language || '').toLowerCase().startsWith('et')) S.lang = 'et'; } catch (e) {} }
   init();
 }

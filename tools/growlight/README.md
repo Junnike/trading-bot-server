@@ -24,3 +24,16 @@ Each lamp is split into several emitters over its real size; each emitter radiat
 
 ## Validation
 Headless Chromium run in `scratchpad/shot.js` (not in repo): no console errors at desktop and phone widths; IES upload of a Lambertian table reproduces the analytic beam within 0.1 %; 630 W 6-bar in a 1.2 × 1.2 m Mylar tent at 0.45 m gives 942 µmol/m²/s average, min 643, uniformity 0.68, in line with manufacturer PPFD maps for that class.
+
+## Check against a real offer (04.11.2026)
+A vertical-farm offer (two 18 m racks, 30 shelves of 3.7 × 1.08 m, five rows of 150 cm tubes 35 cm above the plants, 10 cm free strip on each long side) was rebuilt in the planner as the "Rack shelf" example: 4 × tri-proof 50 W 6000 K 190 lm/W (tilted 10° outward), 6 × T8 25 W 6000 K in housings, 138 W of 660 nm modules, ends set to "continue" (identical neighbour block), sides open, maintenance factor 0.9.
+
+| case | average | min / max | below 250 |
+|---|---|---|---|
+| offer document's own model | 309 | 261 / – | 0 % |
+| this planner, same lamps, MF 0.9 | 196 | 114 / 235 | 100 % |
+| this planner, MF 1.0 | 218 | 127 / 262 | 83 % |
+| this planner, MF 1.0, lamps at 25 cm | 244 | 112 / 322 | 42 % |
+| this planner, MF 0.9, white strips on both long sides (70 %) | 239 | 157 / 290 | 52 % |
+
+Why the offer's model is high: its average implies that about 85 % of all emitted photons land inside the 88 cm growing strip. A Lambertian lamp 35 cm above a 88 cm wide open shelf can only put 52 % (edge rows) to 78 % (centre row) of its light on that strip; weighted over the five rows that is about 60 %, which is what this planner computes (57 % with the tilt). The rest leaves over the open long sides. A second likely cause is the lumen-to-photon factor: this planner uses CRI 80 measurements (73–76 lux per µmol, i.e. 0.0131–0.0137 µmol/s per lumen, AGi32/Bridgelux/bioRxiv values); using the sunlight factor (54 lux per µmol) would overstate every white LED by 35–40 %. With open sides, 35 cm and 428–488 W per 3.3 m² shelf, 250 µmol/m²/s at every point is not reachable with these lamps; it needs white side strips plus about 25 % more lamp output, or a lower hang height with lensed tubes.
