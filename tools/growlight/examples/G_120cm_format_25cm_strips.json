@@ -1,0 +1,204 @@
+{
+ "version": 2,
+ "lang": "en",
+ "plant": "custom",
+ "hours": 16,
+ "custLo": 250,
+ "custHi": 300,
+ "room": {
+  "w": 3.7,
+  "l": 1.08
+ },
+ "wall": "shelf",
+ "reflX": 1,
+ "reflY": 0.7,
+ "images": 2,
+ "hang": 0.25,
+ "mf": 0.9,
+ "tiers": 1,
+ "project": "G  120 cm format 3 per row (6 TP + 9 H), clear, 25 cm, strips",
+ "margin": 10,
+ "layRows": 0,
+ "layCols": 0,
+ "types": [
+  {
+   "id": "t4",
+   "preset": "custom",
+   "name": "2 × T8 120 cm 18 W 3000 K in housing (clear)",
+   "mode": "lm",
+   "lm": 6336,
+   "cct": 3000,
+   "watts": 36,
+   "beam": 150,
+   "beam90": 150,
+   "len": 1.2,
+   "wid": 0.06,
+   "spec": "w3000",
+   "ppf": 87,
+   "cost": 20.4,
+   "bands": {
+    "B": 0.1,
+    "G": 0.4,
+    "R": 0.47,
+    "FR": 0.03
+   },
+   "ies": null,
+   "effIn": 2.5
+  },
+  {
+   "id": "t3",
+   "preset": "custom",
+   "name": "Tri-proof 120 cm 36 W 6000 K",
+   "mode": "lm",
+   "lm": 6840,
+   "cct": 6000,
+   "watts": 36,
+   "beam": 175,
+   "beam90": 120,
+   "len": 1.23,
+   "wid": 0.07,
+   "spec": "w6000",
+   "ppf": 90,
+   "cost": 26,
+   "bands": {
+    "B": 0.25,
+    "G": 0.44,
+    "R": 0.29,
+    "FR": 0.02
+   },
+   "ies": null,
+   "effIn": 2.5
+  }
+ ],
+ "fixtures": [
+  {
+   "t": "t4",
+   "x": 0.6,
+   "y": 0.14,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 0.6,
+   "y": 0.3,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 270
+  },
+  {
+   "t": "t4",
+   "x": 0.6,
+   "y": 0.54,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 0.6,
+   "y": 0.78,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 90
+  },
+  {
+   "t": "t4",
+   "x": 0.6,
+   "y": 0.94,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t4",
+   "x": 1.8,
+   "y": 0.14,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 1.8,
+   "y": 0.3,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 270
+  },
+  {
+   "t": "t4",
+   "x": 1.8,
+   "y": 0.54,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 1.8,
+   "y": 0.78,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 90
+  },
+  {
+   "t": "t4",
+   "x": 1.8,
+   "y": 0.94,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t4",
+   "x": 3,
+   "y": 0.14,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 3,
+   "y": 0.3,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 270
+  },
+  {
+   "t": "t4",
+   "x": 3,
+   "y": 0.54,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  },
+  {
+   "t": "t3",
+   "x": 3,
+   "y": 0.78,
+   "rot": 0,
+   "tilt": 10,
+   "tdir": 90
+  },
+  {
+   "t": "t4",
+   "x": 3,
+   "y": 0.94,
+   "rot": 0,
+   "tilt": 0,
+   "tdir": 0
+  }
+ ],
+ "geek": true,
+ "cell": 2,
+ "subN": 24,
+ "ambient": 0,
+ "price": 0.2,
+ "currency": "€",
+ "view": "ppfd",
+ "numbers": false,
+ "mccree": false
+}
