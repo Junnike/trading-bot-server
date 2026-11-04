@@ -60,5 +60,5 @@ One shelf of the 18.22 m rack, computed whole (open rack ends, 0.18 m gaps betwe
 | tubes in the 150 cm housings | block 4 avg / min | block 5 avg / min | whole shelf avg | W per shelf |
 |---|---|---|---|---|
 | 160 lm/W (offer) | 249 / 107 | 256 / 79 | 245 | 2,360 |
-| 195 lm/W (measured family) | 280 / 101 | 255 / 98 | 271 | 2,360 |
+| 195 lm/W (measured family) | 279 / 117 | 257 / 79 | 271 | 2,360 |
 Staggering the rows (housings at 0.80/2.30 m, tri-proofs at 1.40/2.90 m) leaves the average unchanged and lowers the minimum to 71: keep the even layout. The dark bands (100–150) are the 35 cm between two 150 cm lamps and the block joints; they are inherent to 150 cm lamps in 3.7 m blocks.
