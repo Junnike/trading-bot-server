@@ -417,7 +417,7 @@ function mkType(p) {
 function resolvePPF(t) { if (t.mode === 'lm') t.ppf = Math.round((+t.lm || 0) * (CCT_K[t.cct] || 0.0145)); else if (t.mode === 'eff') t.ppf = Math.round((+t.effIn || 0) * (+t.watts || 0)); }
 function defaultState() {
   const t = mkType(FIXTURES[2]);
-  return { version: 2, lang: 'en', plant: 'cannabis_flower', hours: 12, custLo: 300, custHi: 600, room: { w: 1.2, l: 1.2 }, wall: 'mylar', refl: 0.9, images: 1, hang: 0.45, mf: 0.9, tiers: 1, project: '',
+  return { version: 2, lang: 'en', plant: 'cannabis_flower', hours: 12, custLo: 300, custHi: 600, room: { w: 1.2, l: 1.2 }, wall: 'mylar', refl: 0.9, images: 2, hang: 0.45, mf: 0.9, tiers: 1, project: '',
     types: [t], fixtures: [{ t: t.id, x: 0.6, y: 0.6, rot: 0, tilt: 0, tdir: 0 }], geek: false, gridN: 120, subN: 24, ambient: 0, price: 0.2, currency: '€', view: 'ppfd', numbers: false, mccree: false };
 }
 let S = defaultState();
