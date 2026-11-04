@@ -53,3 +53,12 @@ Per 3.7 × 1.08 m shelf, growing area 370 × 88 cm, 16 h/day, maintenance factor
 | H 120 cm format (9 TP + 6 H), clear, 25 cm, strips | 540 | 356 | 288 | 188 / 325 | 0.65 | 259 |
 | I D + one extra tri-proof row | 600 | 318 | 322 | 159 / 418 | 0.50 | 288 |
 Clear covers alone gain only ~2 %: the diffuser absorbs ~10 % but also narrows the tube's spread, and on an open shelf the wider spread of a bare tube is lost over the sides. The gain appears once white side strips return that light. The standard shelf in the offer has 7 housings (550 W); these variants use 6, so add ~8 % to the averages for the 550 W version.
+
+## Recommended lamp arrangement for the offer (examples/rack_plan.json, picture examples/rack_plan_blocks5-4-3.png)
+One shelf of the 18.22 m rack, computed whole (open rack ends, 0.18 m gaps between blocks), growing strip 88 cm, lamps 25 cm above the plants, white strips (70 %) on both long sides, clear covers, maintenance 0.9. Per 3.7 m block, five rows along the length, two lamps of 150 cm per row at x = 0.925 and 2.775 m: housings with 2 × T8 25 W 3000 K at y = 14, 54 and 94 cm; tri-proof 50 W 6000 K at y = 30 and 78 cm tilted 10° outward. Per 2.7 m end block the same pattern with 120 cm lamps at x = 0.75 and 1.95 m (tri-proof 36 W, housings with the measured 18 W 195 lm/W tubes).
+
+| tubes in the 150 cm housings | block 4 avg / min | block 5 avg / min | whole shelf avg | W per shelf |
+|---|---|---|---|---|
+| 160 lm/W (offer) | 249 / 107 | 256 / 79 | 245 | 2,360 |
+| 195 lm/W (measured family) | 280 / 101 | 255 / 98 | 271 | 2,360 |
+Staggering the rows (housings at 0.80/2.30 m, tri-proofs at 1.40/2.90 m) leaves the average unchanged and lowers the minimum to 71: keep the even layout. The dark bands (100–150) are the 35 cm between two 150 cm lamps and the block joints; they are inherent to 150 cm lamps in 3.7 m blocks.
