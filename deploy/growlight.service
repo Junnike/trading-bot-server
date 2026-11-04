@@ -1,0 +1,13 @@
+# /etc/systemd/system/growlight.service — serves the Grow Light Planner as a static page on port 8080 (no dependencies beyond python3).
+# For production put index.html behind nginx instead.
+[Unit]
+Description=Grow Light Planner static server
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/trading-bot-server/tools/growlight
+ExecStart=/usr/bin/python3 -m http.server 8080 --bind 0.0.0.0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
