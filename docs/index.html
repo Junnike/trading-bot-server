@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+</head>
+<body>
+<title>Grow Light Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: app shell. Sticky top bar; three columns on wide screens (setup | stage | results) that stack to one column under 1100px.
+   The heatmap is the hero; everything else is quiet. Four themes (ice, moss, sand, dusk) chosen with data-palette, each with a dark and a light set chosen with data-theme; ice dark is the default and the only set on the bare :root. */
+:root{
+  --bg:#0a1322; --panel:#101d31; --panel-2:#16283f; --line:#24405f; --line-2:#345c86;
+  --fg:#e9f3ff; --muted:#93b1cf; --accent:#8be4ff; --accent-2:#36b3ea; --accent-ink:#06283a;
+  --good:#5ce8a6; --warn:#ffcf6b; --bad:#ff7084;
+  --font-display:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius:10px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){ --bg:#eef4fa; --panel:#ffffff; --panel-2:#e6eff8; --line:#c3d6ea; --line-2:#9fbcd9; --fg:#0c1b2d; --muted:#4e6c8c; --accent:#0a84c6; --accent-2:#0369a1; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,50,90,.12); color-scheme:light }
+}
+:root[data-theme="light"]{ --bg:#eef4fa; --panel:#ffffff; --panel-2:#e6eff8; --line:#c3d6ea; --line-2:#9fbcd9; --fg:#0c1b2d; --muted:#4e6c8c; --accent:#0a84c6; --accent-2:#0369a1; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,50,90,.12); color-scheme:light }
+/* Moss: deep green with a mint accent. */
+:root[data-palette="moss"]{ --bg:#0a1510; --panel:#102019; --panel-2:#172b22; --line:#25453a; --line-2:#37685a; --fg:#ecf6ee; --muted:#9dbfaa; --accent:#9ff2b0; --accent-2:#3fc77c; --accent-ink:#06301a; --good:#8ae8a4; --warn:#ffd36b; --bad:#ff7b7b; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="moss"]:not([data-theme="dark"]){ --bg:#eef4ee; --panel:#ffffff; --panel-2:#e2eee4; --line:#c2d9c8; --line-2:#9bc2a6; --fg:#0f1f16; --muted:#4f6e5b; --accent:#1f8a4c; --accent-2:#166b3a; --accent-ink:#ffffff; --good:#1f8a4c; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,70,40,.12); color-scheme:light }
+}
+:root[data-palette="moss"][data-theme="light"]{ --bg:#eef4ee; --panel:#ffffff; --panel-2:#e2eee4; --line:#c2d9c8; --line-2:#9bc2a6; --fg:#0f1f16; --muted:#4f6e5b; --accent:#1f8a4c; --accent-2:#166b3a; --accent-ink:#ffffff; --good:#1f8a4c; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(20,70,40,.12); color-scheme:light }
+/* Sand: warm beige paper with a terracotta accent; its dark set is warm brown. */
+:root[data-palette="sand"]{ --bg:#171310; --panel:#211b16; --panel-2:#2b241d; --line:#43382c; --line-2:#65543f; --fg:#f4ecdf; --muted:#b8a78f; --accent:#f0c178; --accent-2:#d9962f; --accent-ink:#2a1d08; --good:#86dba0; --warn:#ffd56e; --bad:#ff8a80; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="sand"]:not([data-theme="dark"]){ --bg:#f3eee4; --panel:#fffcf6; --panel-2:#ece4d5; --line:#d8ccb6; --line-2:#bda98a; --fg:#2a2218; --muted:#7a6a54; --accent:#b9641f; --accent-2:#8f4a12; --accent-ink:#ffffff; --good:#257a4a; --warn:#a5660a; --bad:#c0392b; --shadow:0 10px 30px rgba(80,60,20,.12); color-scheme:light }
+}
+:root[data-palette="sand"][data-theme="light"]{ --bg:#f3eee4; --panel:#fffcf6; --panel-2:#ece4d5; --line:#d8ccb6; --line-2:#bda98a; --fg:#2a2218; --muted:#7a6a54; --accent:#b9641f; --accent-2:#8f4a12; --accent-ink:#ffffff; --good:#257a4a; --warn:#a5660a; --bad:#c0392b; --shadow:0 10px 30px rgba(80,60,20,.12); color-scheme:light }
+/* Dusk: plum with a lavender accent. */
+:root[data-palette="dusk"]{ --bg:#110c1c; --panel:#191230; --panel-2:#221a3f; --line:#37305e; --line-2:#514687; --fg:#f1ecff; --muted:#a99ecf; --accent:#c9b3ff; --accent-2:#8f6cff; --accent-ink:#1b0f3d; --good:#7fe6b0; --warn:#ffcf6b; --bad:#ff7a9a; --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark }
+@media (prefers-color-scheme: light){
+  :root[data-palette="dusk"]:not([data-theme="dark"]){ --bg:#f1eef8; --panel:#ffffff; --panel-2:#e8e3f5; --line:#cdc5e6; --line-2:#a89bd3; --fg:#171130; --muted:#5d5480; --accent:#6a3ed9; --accent-2:#4f2bb0; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(50,30,100,.12); color-scheme:light }
+}
+:root[data-palette="dusk"][data-theme="light"]{ --bg:#f1eef8; --panel:#ffffff; --panel-2:#e8e3f5; --line:#cdc5e6; --line-2:#a89bd3; --fg:#171130; --muted:#5d5480; --accent:#6a3ed9; --accent-2:#4f2bb0; --accent-ink:#ffffff; --good:#13925e; --warn:#a9690f; --bad:#cf3449; --shadow:0 10px 30px rgba(50,30,100,.12); color-scheme:light }
+
+*{box-sizing:border-box}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:18px;font-weight:600}
+h2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+h3{font-size:14px;font-weight:600}
+p{margin:0}
+small,.small{font-size:12px;color:var(--muted)}
+a{color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--panel);border-bottom:1px solid var(--line)}
+.topbar-in{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 1px var(--line-2) inset;position:relative;flex:none}
+.brand .mark::after{content:"";position:absolute;left:8px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--accent-ink);opacity:.9}
+.topbar .spacer{flex:1}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.app{display:grid;grid-template-columns:330px minmax(0,1fr) 300px;gap:16px;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1500px;margin:0 auto}
+@media (max-width:1100px){.app{grid-template-columns:1fr}}
+.col{min-width:0;display:flex;flex-direction:column;gap:14px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.sub{background:var(--panel-2)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row > *{min-width:0}
+.field{display:flex;flex-direction:column;gap:4px;flex:1 1 110px;min-width:0}
+.field label{font-size:12px;color:var(--muted)}
+.field .unit{font-size:11px;color:var(--muted)}
+.field > .row > input{flex:1 1 60px;width:auto}
+input[type=number],input[type=text],select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--fg);min-width:0}
+input[type=number]{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=file]{font-size:12px;color:var(--muted);max-width:100%}
+select{appearance:auto}
+.btn{background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;padding:7px 11px;color:var(--fg);font-weight:600;font-size:13px;white-space:nowrap}
+.btn:hover{border-color:var(--accent-2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 8px;font-size:12px;font-weight:500}
+.btn.danger{color:var(--bad)}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;user-select:none}
+.switch input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.geek{display:none}
+body.geekmode .geek{display:flex}
+body.geekmode .geek.block{display:block}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid var(--line-2);background:var(--panel-2)}
+.pill.good{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.pill.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.pill.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:5px 9px;font-size:12px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg.pal button{display:inline-flex;align-items:center;gap:6px}
+.seg.pal i{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(0,0,0,.35) inset;flex:none}
+@media (max-width:760px){.seg.pal span{display:none}.seg.pal button{padding:6px 8px}}
+
+.type{gap:8px}
+.type .head{display:flex;align-items:center;gap:8px}
+.type .head .swatch{width:12px;height:12px;border-radius:3px;flex:none}
+.type .head h3{flex:1;font-size:13px}
+.hint{font-size:12px;color:var(--muted);line-height:1.4}
+
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 10px;color:var(--muted);font-weight:600;font-size:13px}
+.tab[aria-selected="true"]{background:var(--panel-2);border-color:var(--line-2);color:var(--fg)}
+.stage-wrap{position:relative;width:100%;max-width:100%}
+canvas.stage{display:block;width:100%;height:auto;border-radius:8px;background:var(--bg);touch-action:none;cursor:grab}
+canvas.stage.dragging{cursor:grabbing}
+canvas.legend{display:block;width:100%;height:46px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.charts{grid-template-columns:1fr}}
+.charts canvas{display:block;width:100%;height:150px;background:var(--panel-2);border-radius:8px}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:var(--panel-2);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tile .v{font-family:var(--font-display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .u{font-size:11px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
+.kv div:nth-child(even){text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.kv .m{color:var(--muted);font-weight:400}
+.specbar{display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.specbar span{display:block;height:100%}
+.speckey{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.speckey i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.fixlist{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto}
+.fixrow{display:grid;grid-template-columns:22px 1fr 64px 64px auto;gap:6px;align-items:center;font-size:12px}
+body.geekmode .fixrow{grid-template-columns:22px 1fr 54px 54px 46px 46px 46px auto}
+.fixrow input{padding:4px 6px;font-size:12px}
+.fixrow .n{font-weight:700;text-align:center;color:var(--muted)}
+.fixrow .geekcell{display:none}
+body.geekmode .fixrow .geekcell{display:block}
+details{border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+details summary{cursor:pointer;font-weight:600;font-size:13px}
+details p{margin-top:8px;font-size:12px;color:var(--muted)}
+.footer{padding-block:12px 24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));color:var(--muted);font-size:12px;max-width:1500px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:max(16px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line-2);color:var(--fg);padding:8px 14px;border-radius:999px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+</style>
+
+<header class="topbar"><div class="topbar-in">
+  <div class="brand"><div class="mark" aria-hidden="true"></div><div><h1>Grow Light Planner</h1><small data-i18n="tagline">PPFD, DLI and spectrum for any room and any mix of lamps</small></div></div>
+  <div class="spacer"></div>
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Language"><button type="button" id="langEn" aria-pressed="true">EN</button><button type="button" id="langEt" aria-pressed="false">ET</button></div>
+    <label class="switch"><input type="checkbox" id="geek"> <span data-i18n="geek">Geek mode</span></label>
+    <button class="btn small" id="btnExample" type="button" data-i18n="example">Example room</button>
+    <button class="btn small" id="btnSave" type="button" data-i18n="save">Save JSON</button>
+    <label class="btn small" for="fileLoad" data-i18n="load">Load JSON</label><input type="file" id="fileLoad" accept=".json,application/json" hidden>
+    <div class="seg pal" role="group" aria-label="Theme" id="palettes"><button type="button" data-pal="ice" aria-pressed="true" title="Ice blue"><i style="background:#8be4ff"></i><span data-i18n="palIce">Ice</span></button><button type="button" data-pal="moss" aria-pressed="false" title="Moss green"><i style="background:#9ff2b0"></i><span data-i18n="palMoss">Moss</span></button><button type="button" data-pal="sand" aria-pressed="false" title="Sand beige"><i style="background:#e0b070"></i><span data-i18n="palSand">Sand</span></button><button type="button" data-pal="dusk" aria-pressed="false" title="Dusk violet"><i style="background:#c9b3ff"></i><span data-i18n="palDusk">Dusk</span></button></div>
+    <button class="btn small" id="themeToggle" type="button" data-i18n="theme" title="Switch between the light and the dark version of the theme">Light / dark</button>
+  </div>
+</div></header>
+
+<main class="app">
+<!-- ================= SETUP ================= -->
+<div class="col" id="setup">
+  <section class="card">
+    <h2 data-i18n="s1">1 · Plant</h2>
+    <div class="field"><label for="plant" data-i18n="plantQ">What are you growing?</label><select id="plant"></select></div>
+    <div class="row">
+      <div class="field"><label for="hours" data-i18n="hours">Light hours per day</label><input type="number" id="hours" min="1" max="24" step="0.5"></div>
+      <div class="field" id="custWrap" hidden><label data-i18n="custRange">Target PPFD range</label><div class="row"><input type="number" id="custLo" min="0" step="10" aria-label="Target minimum"><input type="number" id="custHi" min="0" step="10" aria-label="Target maximum"></div></div>
+    </div>
+    <p class="hint" id="plantInfo"></p>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="s2">2 · Room or tent</h2>
+    <div class="row">
+      <div class="field"><label for="roomW"><span data-i18n="width">Width</span> <span class="unit">m</span></label><input type="number" id="roomW" min="0.2" max="30" step="0.05"></div>
+      <div class="field"><label for="roomL"><span data-i18n="length">Length</span> <span class="unit">m</span></label><input type="number" id="roomL" min="0.2" max="30" step="0.05"></div>
+    </div>
+    <div class="field"><label for="wall" data-i18n="walls">Walls</label><select id="wall"></select></div>
+    <div class="row geek">
+      <div class="field"><label for="reflX"><span data-i18n="reflX">Ends (left / right) reflect</span> <span id="reflXVal"></span></label><input type="range" id="reflX" min="0" max="1" step="0.05"></div>
+      <div class="field"><label for="reflY"><span data-i18n="reflY">Sides (front / back) reflect</span> <span id="reflYVal"></span></label><input type="range" id="reflY" min="0" max="1" step="0.05"></div>
+    </div>
+    <div class="row geek">
+      <div class="field"><label for="images" data-i18n="bounces">Reflection bounces</label><select id="images"><option value="0" data-i18n="b0">none</option><option value="1" data-i18n="b1">1 bounce</option><option value="2" data-i18n="b2">2 bounces</option><option value="3" data-i18n="b3">3 bounces (slow)</option></select></div>
+      <div class="field"><label for="margin"><span data-i18n="margin">Canopy margin</span> <span class="unit">cm</span></label><input type="number" id="margin" min="0" max="100" step="1"></div>
+    </div>
+    <p class="hint geek block" data-i18n="shelfHint">For a shelf in a rack set the ends to 100 % (the next block repeats the same lamps) and the sides to 0 % (open). The margin excludes a strip along all four edges from the statistics.</p>
+  </section>
+
+  <section class="card">
+    <h2 data-i18n="s3">3 · Lamps</h2>
+    <div class="row">
+      <div class="field"><label for="hang"><span data-i18n="hang">Hang height above canopy</span> <span class="unit">m</span></label><input type="number" id="hang" min="0.05" max="10" step="0.05"></div>
+      <div class="field" style="flex:0 0 auto;justify-content:flex-end"><label>&nbsp;</label><button class="btn" id="btnFit" type="button" data-i18n="fit">Fit height to target</button></div>
+    </div>
+    <div id="types"></div>
+    <div class="row"><button class="btn" id="btnAddType" type="button" data-i18n="addType">+ Add another lamp type (mix)</button><button class="btn" id="btnSuggest" type="button" data-i18n="suggest">Suggest count</button></div>
+    <div class="row" style="justify-content:space-between"><h3 data-i18n="placement">Placement</h3><button class="btn small" id="btnAuto" type="button" data-i18n="auto">Auto layout</button></div>
+    <div class="row geek">
+      <div class="field"><label for="layRows"><span data-i18n="layRows">Rows (along the length)</span></label><input type="number" id="layRows" min="0" max="50" step="1" placeholder="auto"></div>
+      <div class="field"><label for="layCols"><span data-i18n="layCols">Columns (along the width)</span></label><input type="number" id="layCols" min="0" max="50" step="1" placeholder="auto"></div>
+    </div>
+    <p class="hint" data-i18n="dragHint">Drag lamps on the map. Positions are the lamp centre, in metres from the bottom-left corner.</p>
+    <div class="fixlist" id="fixtures"></div>
+  </section>
+
+  <section class="card geek block">
+    <h2 data-i18n="geekS">Geek settings</h2>
+    <div class="row">
+      <div class="field"><label for="example" data-i18n="exampleL">Load an example</label><select id="example"><option value="">…</option><option value="tent" data-i18n="exTent">Tent 1.2 m, one 630 W bar light</option><option value="shelf" data-i18n="exShelf">Rack shelf 3.7 × 1.08 m, tubes at 35 cm</option></select></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="project" data-i18n="project">Project name</label><input type="text" id="project" maxlength="60"></div>
+      <div class="field" style="flex:0 0 120px"><label for="tiers" data-i18n="tiers">Identical tiers</label><input type="number" id="tiers" min="1" max="50" step="1"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="mf"><span data-i18n="mf">Maintenance factor</span> <span id="mfVal"></span></label><input type="range" id="mf" min="0.5" max="1" step="0.05"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="cell"><span data-i18n="gridN">Map cell size</span> <span class="unit">cm</span></label><select id="cell"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select></div>
+      <div class="field"><label for="subN"><span data-i18n="subN">Emitter detail</span> <span class="unit" data-i18n="subNu">points per lamp</span></label><select id="subN"><option>1</option><option>8</option><option>24</option><option>48</option></select></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="ambient"><span data-i18n="ambient">Ambient / sun DLI added</span> <span class="unit">mol/m²/d</span></label><input type="number" id="ambient" min="0" max="80" step="0.5"></div>
+      <div class="field"><label for="price"><span data-i18n="price">Electricity price</span> <span class="unit" data-i18n="perkwh">per kWh</span></label><input type="number" id="price" min="0" step="0.01"></div>
+      <div class="field" style="flex:0 0 70px"><label for="currency" data-i18n="currency">Currency</label><input type="text" id="currency" maxlength="4"></div>
+    </div>
+    <label class="switch"><input type="checkbox" id="mccree"> <span data-i18n="mccree">Show McCree-weighted yield photon flux (YPFD)</span></label>
+    <div class="card sub">
+      <h3 data-i18n="lux">Lux to PPFD converter</h3>
+      <div class="row">
+        <div class="field"><label for="luxIn" data-i18n="luxIn">Lux reading</label><input type="number" id="luxIn" min="0" step="100" value="20000"></div>
+        <div class="field"><label for="luxSrc" data-i18n="luxSrc">Light source</label><select id="luxSrc"></select></div>
+        <div class="field" style="flex:0 0 90px"><label>PPFD</label><div class="tile" style="padding:6px 8px"><span class="v" id="luxOut" style="font-size:18px">–</span><span class="u">µmol/m²/s</span></div></div>
+      </div>
+      <p class="hint" data-i18n="luxHint">Lux meters weight light for the human eye, so the factor depends on the lamp's colour. These factors are typical values, good to about ±10 %.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= STAGE ================= -->
+<div class="col">
+  <section class="card">
+    <div class="row" style="justify-content:space-between">
+      <div class="tabs" role="tablist" id="views">
+        <button class="tab" role="tab" data-view="ppfd" aria-selected="true" type="button">PPFD</button>
+        <button class="tab" role="tab" data-view="target" type="button" data-i18n="vTarget">Target fit</button>
+        <button class="tab" role="tab" data-view="dli" type="button">DLI</button>
+        <button class="tab" role="tab" data-view="blue" type="button" data-i18n="vBlue">Blue %</button>
+        <button class="tab" role="tab" data-view="rfr" type="button" data-i18n="vRfr">Red : far-red</button>
+      </div>
+      <div class="row"><label class="switch"><input type="checkbox" id="numbers"> <span data-i18n="numbers">Numbers</span></label><button class="btn small" id="btnPng" type="button">PNG</button><button class="btn small" id="btnCsv" type="button">CSV</button></div>
+    </div>
+    <div class="stage-wrap"><canvas class="stage" id="stage" aria-label="Top view of the canopy with light levels"></canvas></div>
+    <canvas class="legend" id="legend" aria-hidden="true"></canvas>
+    <p class="hint" data-i18n="stageHint">Top view of the canopy. Colour = photon flux at the canopy. Drag a lamp to move it. Press Delete to remove the selected lamp.</p>
+    <div class="charts"><canvas id="secX" aria-label="Light level across the width at the centre line"></canvas><canvas id="secY" aria-label="Light level along the length at the centre line"></canvas></div>
+  </section>
+  <details><summary data-i18n="how">How the numbers are calculated</summary>
+    <p data-i18n="howText">Each lamp is split into several small emitters across its real size. Every emitter sends photons in a cone: a Lambertian (120°) spread for bare LED boards and bars, a tighter cone for reflectors, or the exact beam from an uploaded IES or LDT photometric file. PPFD at a point is the sum over all emitters of output × beam shape × cosine of the incidence angle ÷ distance², the same inverse-square geometry used by DIALux and AGi32. Walls add mirror images of every lamp scaled by the wall reflectance, which is how reflective tents and white rooms gain light at the edges. DLI = PPFD × hours × 0.0036. Spectrum bands are per-lamp photon fractions (blue 400–500, green 500–600, red 600–700, far-red 700–750 nm); far-red counts in ePAR but not in PPFD. Lamp presets use typical 2025–2026 catalogue values; enter your own lamp's PPF from its spec sheet for exact numbers. The maintenance factor (default 0.9) allows for lamp ageing and dust.</p>
+  </details>
+</div>
+
+<!-- ================= RESULTS ================= -->
+<div class="col" id="results">
+  <section class="card">
+    <h2 data-i18n="results">Results at the canopy</h2>
+    <div class="tiles">
+      <div class="tile"><span class="v" id="r_avg">–</span><span class="u" data-i18n="avgU">average PPFD, µmol/m²/s</span></div>
+      <div class="tile"><span class="v" id="r_unif">–</span><span class="u" data-i18n="unifU">uniformity, min ÷ avg</span></div>
+      <div class="tile"><span class="v" id="r_dli">–</span><span class="u" data-i18n="dliU">DLI, mol/m²/day</span></div>
+      <div class="tile"><span class="v" id="r_cov">–</span><span class="u" data-i18n="covU">of canopy inside target</span></div>
+    </div>
+    <div class="row" id="verdicts"></div>
+    <div class="kv">
+      <div class="m" data-i18n="minmax">Minimum / maximum</div><div id="r_minmax">–</div>
+      <div class="m" data-i18n="cv">Variation (CV)</div><div id="r_cv">–</div>
+      <div class="m" data-i18n="epar">ePAR incl. far-red</div><div id="r_epar">–</div>
+      <div class="m" id="r_ypfd_l" hidden>YPFD (McCree)</div><div id="r_ypfd" hidden>–</div>
+      <div class="m" data-i18n="capture">Photons reaching canopy</div><div id="r_capture">–</div>
+      <div class="m" data-i18n="belowabove">Below / above target</div><div id="r_belowabove">–</div>
+    </div>
+  </section>
+  <section class="card">
+    <h2 data-i18n="spectrum">Spectrum at the canopy</h2>
+    <div class="specbar" id="specBar" aria-hidden="true"></div>
+    <div class="speckey"><span><i style="background:#4f8cff"></i><span data-i18n="blue">Blue</span></span><span><i style="background:#5fe08a"></i><span data-i18n="green">Green</span></span><span><i style="background:#ff5c5c"></i><span data-i18n="red">Red</span></span><span><i style="background:#9b4dca"></i><span data-i18n="farred">Far-red</span></span></div>
+    <div class="kv">
+      <div class="m" data-i18n="bgr">Blue · green · red</div><div id="r_bgr">–</div>
+      <div class="m" data-i18n="rfr">Red : far-red ratio</div><div id="r_rfr">–</div>
+      <div class="m" data-i18n="frshare">Far-red share of ePAR</div><div id="r_fr">–</div>
+    </div>
+  </section>
+  <section class="card">
+    <h2 data-i18n="power">Power and cost</h2>
+    <div class="kv">
+      <div class="m" data-i18n="lampPower">Lamp power</div><div id="r_watts">–</div>
+      <div class="m" data-i18n="eff">System efficacy</div><div id="r_eff">–</div>
+      <div class="m" data-i18n="energy">Energy per day</div><div id="r_kwh">–</div>
+      <div class="m" data-i18n="cost">Cost per day · month</div><div id="r_cost">–</div>
+      <div class="m" data-i18n="heat">Heat to remove</div><div id="r_heat">–</div>
+    </div>
+    <p class="hint" id="tiersNote" hidden></p>
+  </section>
+  <section class="card">
+    <h2 data-i18n="targets">Targets for this plant</h2>
+    <div class="kv">
+      <div class="m" data-i18n="ppfdRange">PPFD range</div><div id="t_ppfd">–</div>
+      <div class="m" data-i18n="dliRange">DLI range</div><div id="t_dli">–</div>
+      <div class="m" data-i18n="photoperiod">Photoperiod</div><div id="t_hours">–</div>
+    </div>
+    <p class="hint" id="t_note"></p>
+  </section>
+</div>
+</main>
+<div class="footer" data-i18n="footer">Typical target ranges follow published horticulture guidance (e.g. Michigan State University floriculture lighting plans and manufacturer growing guides); treat them as starting points, not laws. If a download button does nothing, open this page as a file on your computer or from your own server.</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const DEG = Math.PI / 180;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const fmt = (v, d = 0) => (v == null || !isFinite(v)) ? '–' : v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2400); };
+
+/* ---------------- languages ---------------- */
+const I18N = {
+  en: {
+    theme: 'Light / dark', palIce: 'Ice', palMoss: 'Moss', palSand: 'Sand', palDusk: 'Dusk',
+    vTarget: 'Target fit', vBlue: 'Blue %', vRfr: 'Red : far-red',
+    reflX: 'Ends (left / right) reflect', reflY: 'Sides (front / back) reflect', margin: 'Canopy margin', shelfHint: 'For a shelf in a rack set the ends to 100 % (the next block repeats the same lamps) and the sides to 0 % (open). The margin excludes a strip along all four edges from the statistics.', layRows: 'Rows (along the length)', layCols: 'Columns (along the width)', exampleL: 'Load an example', exTent: 'Tent 1.2 m, one 630 W bar light', exShelf: 'Rack shelf 3.7 × 1.08 m, tubes at 35 cm', wShelf: 'Shelf in a rack: ends continue, sides open', coarse: 'Map made coarser to stay fast', tdir: 'tilt toward, ° (0 = +x, 90 = +y)',
+    ofPpf: 'of PPF', noFr: 'no far-red', tiersNote: 'tiers in total: power and cost are multiplied, the map shows one tier.', perDay: 'per day',
+    target: 'target', below: 'below', inRange: 'in range', above: 'above', lPpfd: 'PPFD, µmol/m²/s', lDli: 'DLI, mol/m²/day', lBlue: 'Blue share of photons, %', lRfr: 'Red : far-red ratio (capped at 30)',
+    secX: 'PPFD across the width, centre line', secY: 'PPFD along the length, centre line', addLamp: 'Add a lamp type to see the map.',
+    plantInfo: 'Target {lo}–{hi} µmol/m²/s, DLI {a}–{b} mol/m²/day at {h} h.', co2: 'Above about 1000 µmol/m²/s only pays off with added CO₂.', frNote: 'Enter only the 400–700 nm part of the output; the far-red comes from the spectrum preset.',
+    wNone: 'Open space, no reflection', wDark: 'Dark or unpainted walls', wWhite: 'White painted walls', wMylar: 'Grow tent / Mylar',
+    lampType: 'Lamp type', remove: 'Remove', preset: 'Preset', name: 'Name', count: 'How many', outputAs: 'Output given as', mPpf: 'PPF (µmol/s)', mLm: 'lumens + colour temperature', mEff: 'efficacy (µmol/J) × W',
+    ppf: 'PPF', ppfU: 'µmol/s, 400–700', lm: 'Luminous flux', cct: 'Colour temperature', effIn: 'Efficacy', watts: 'Power', beam: 'Beam along the length', beam90: 'Beam across', beamU: '° full width', size: 'Size', sizeU: 'length × width, m', spectrumL: 'Spectrum',
+    bB: 'Blue %', bG: 'Green %', bR: 'Red %', bFR: 'Far-red %', iesL: 'Photometric file (IES or LDT)', using: 'using', noneBeam: 'none, using the beam angle', clearies: 'Use beam angle instead',
+    lambert: 'Lambertian spread, typical for bare LED boards and bars', beamFromFile: 'beam from file', beamDeg: '° beam', beamAsym: 'beam along × across',
+    onTarget: 'On target', tooDim: 'Too dim: lower the lamps or add one', tooBright: 'Too bright: raise or dim the lamps', unevenC: 'Uneven: centre and edges differ', even: 'Even light', patchy: 'Patchy edges', uneven: 'Uneven',
+    dliIn: 'DLI in range', dliLow: 'DLI low: more hours or light', dliHigh: 'DLI high: fewer hours',
+    exampleLoaded: 'Example room loaded', planLoaded: 'Plan loaded', notPlan: 'Not a plan file', saved: 'Saved', dlBlocked: 'Download blocked here: open the page as a file on your computer', cantRead: 'Could not read the file', loaded: 'Loaded',
+    fitLow: 'Even at 5 cm the average is below target: add lamps', fitHigh: 'Even at 6 m it is too bright: remove lamps', fitSet: 'Hang height set to',
+  },
+  et: {
+    tagline: 'PPFD, DLI ja spekter igale ruumile ja igale valgustite kombinatsioonile', geek: 'Nohiku režiim', example: 'Näidisruum', save: 'Salvesta JSON', load: 'Laadi JSON', theme: 'Hele / tume', palIce: 'Jää', palMoss: 'Sammal', palSand: 'Liiv', palDusk: 'Hämarik',
+    s1: '1 · Taim', plantQ: 'Mida sa kasvatad?', hours: 'Valgustunde ööpäevas', custRange: 'Siht-PPFD vahemik',
+    s2: '2 · Ruum või telk', width: 'Laius', length: 'Pikkus', walls: 'Seinad', refl: 'Seinte peegeldus', bounces: 'Peegelduste arv', b0: 'puudub', b1: '1 peegeldus', b2: '2 peegeldust', b3: '3 peegeldust (aeglane)',
+    s3: '3 · Valgustid', hang: 'Riputuskõrgus taimede kohal', fit: 'Sobita kõrgus sihile', addType: '+ Lisa teine valgustitüüp (sega)', suggest: 'Soovita kogus', placement: 'Paigutus', auto: 'Automaatpaigutus',
+    dragHint: 'Lohista valgusteid kaardil. Asukoht on valgusti kese meetrites alumisest vasakust nurgast.',
+    geekS: 'Nohiku seaded', project: 'Projekti nimi', tiers: 'Ühesuguseid korruseid', mf: 'Hooldetegur (vananemine, tolm)', gridN: 'Kaardi ruudu suurus', subN: 'Kiirguri detailsus', subNu: 'punkti valgusti kohta',
+    ambient: 'Lisanduv päikese DLI', price: 'Elektri hind', perkwh: 'kWh kohta', currency: 'Valuuta', mccree: 'Näita McCree kaaluga saagifootonvoogu (YPFD)',
+    lux: 'Luks → PPFD teisendaja', luxIn: 'Luksi näit', luxSrc: 'Valgusallikas', luxHint: 'Luksmeeter kaalub valgust inimsilma järgi, seega tegur sõltub lambi värvist. Need on tüüpilised väärtused, täpsus umbes ±10 %.',
+    vTarget: 'Sihi sobivus', vBlue: 'Sinine %', vRfr: 'Punane : sügavpunane', numbers: 'Numbrid',
+    stageHint: 'Pealtvaade taimede tasandile. Värv = footonvoog taimede kohal. Lohista valgustit, et seda liigutada. Delete-klahv eemaldab valitud valgusti.',
+    how: 'Kuidas numbrid arvutatakse',
+    howText: 'Iga valgusti jagatakse mitmeks väikeseks kiirguriks üle tema tegeliku suuruse. Iga kiirgur saadab footoneid koonusena: katteta LED-paneelidele ja -lattidele Lamberti (120°) jaotus, reflektoritele kitsam koonus või täpne jaotus üleslaaditud IES- või LDT-failist. PPFD punktis on summa üle kõigi kiirgurite: valgusvoog × jaotus × langemisnurga koosinus ÷ kaugus², sama pöördruutgeomeetria, mida kasutavad DIALux ja AGi32. Seinad lisavad iga valgusti peegelpildid, korrutatuna seinte peegeldusega; nii saavad peegeldavad telgid ja valged ruumid servadesse rohkem valgust. DLI = PPFD × tunnid × 0,0036. Spektri ribad on valgusti footonite osakaalud (sinine 400–500, roheline 500–600, punane 600–700, sügavpunane 700–750 nm); sügavpunane kuulub ePAR-i, aga mitte PPFD-sse. Eelseadistused kasutavad tüüpilisi 2025–2026 kataloogiväärtusi; täpseteks numbriteks sisesta oma valgusti PPF andmelehelt. Hooldetegur (vaikimisi 0,9) arvestab lampide vananemise ja tolmuga.',
+    results: 'Tulemused taimede tasandil', avgU: 'keskmine PPFD, µmol/m²/s', unifU: 'ühtlus, min ÷ keskmine', dliU: 'DLI, mol/m²/päev', covU: 'taimealast sihis', minmax: 'Miinimum / maksimum', cv: 'Hajuvus (CV)', epar: 'ePAR koos sügavpunasega', capture: 'Footoneid jõuab taimedeni', belowabove: 'Alla / üle sihi',
+    spectrum: 'Spekter taimede tasandil', blue: 'Sinine', green: 'Roheline', red: 'Punane', farred: 'Sügavpunane', bgr: 'Sinine · roheline · punane', rfr: 'Punase ja sügavpunase suhe', frshare: 'Sügavpunase osa ePAR-ist',
+    power: 'Võimsus ja kulu', lampPower: 'Valgustite võimsus', eff: 'Süsteemi tõhusus', energy: 'Energia päevas', cost: 'Kulu päevas · kuus', heat: 'Eemaldatav soojus',
+    targets: 'Selle taime sihid', ppfdRange: 'PPFD vahemik', dliRange: 'DLI vahemik', photoperiod: 'Valgusperiood',
+    footer: 'Tüüpilised sihtvahemikud järgivad avaldatud aiandusjuhiseid (nt Michigani ülikooli lillekasvatuse valgustusplaanid ja tootjate kasvatusjuhendid); võta neid lähtepunktina, mitte seadusena. Kui allalaadimisnupp ei tee midagi, ava see leht failina oma arvutis või oma serverist.',
+    lampType: 'Valgustitüüp', remove: 'Eemalda', preset: 'Eelseadistus', name: 'Nimi', count: 'Mitu tükki', outputAs: 'Valgusvoog antud kui', mPpf: 'PPF (µmol/s)', mLm: 'luumenid + värvustemperatuur', mEff: 'tõhusus (µmol/J) × W',
+    ppf: 'PPF', ppfU: 'µmol/s, 400–700', lm: 'Valgusvoog', cct: 'Värvustemperatuur', effIn: 'Tõhusus', watts: 'Võimsus', beam: 'Kiir piki pikkust', beam90: 'Kiir risti', beamU: '° täisnurk', size: 'Mõõdud', sizeU: 'pikkus × laius, m', spectrumL: 'Spekter',
+    bB: 'Sinine %', bG: 'Roheline %', bR: 'Punane %', bFR: 'Sügavpunane %', iesL: 'Fotomeetriline fail (IES või LDT)', using: 'kasutusel', noneBeam: 'puudub, kasutusel kiirenurk', clearies: 'Kasuta kiirenurka',
+    lambert: 'Lamberti jaotus, tüüpiline katteta LED-paneelidele ja -lattidele', beamFromFile: 'jaotus failist', beamDeg: '° kiir', beamAsym: 'kiir piki × risti',
+    onTarget: 'Sihis', tooDim: 'Liiga hämar: langeta valgusteid või lisa üks', tooBright: 'Liiga hele: tõsta või hämarda valgusteid', unevenC: 'Ebaühtlane: keskkoht ja servad erinevad', even: 'Ühtlane valgus', patchy: 'Laigulised servad', uneven: 'Ebaühtlane',
+    dliIn: 'DLI sihis', dliLow: 'DLI madal: rohkem tunde või valgust', dliHigh: 'DLI kõrge: vähem tunde',
+    exampleLoaded: 'Näidisruum laaditud', planLoaded: 'Plaan laaditud', notPlan: 'See pole plaanifail', saved: 'Salvestatud', dlBlocked: 'Allalaadimine on siin blokeeritud: ava leht failina', cantRead: 'Faili ei õnnestunud lugeda', loaded: 'Laaditud',
+    fitLow: 'Isegi 5 cm kõrgusel jääb keskmine alla sihi: lisa valgusteid', fitHigh: 'Isegi 6 m kõrgusel on liiga hele: eemalda valgusteid', fitSet: 'Riputuskõrgus seatud', hangTo: 'm',
+    target: 'siht', below: 'alla', inRange: 'sihis', above: 'üle', lPpfd: 'PPFD, µmol/m²/s', lDli: 'DLI, mol/m²/päev', lBlue: 'Sinise osa footonitest, %', lRfr: 'Punase ja sügavpunase suhe (piir 30)',
+    secX: 'PPFD laiuse suunas, keskjoon', secY: 'PPFD pikkuse suunas, keskjoon', addLamp: 'Lisa valgustitüüp, et kaarti näha.', ofPpf: 'PPF-ist', noFr: 'sügavpunane puudub', perDay: 'päevas', tiersNote: 'korrust kokku: võimsus ja kulu on korrutatud, kaart näitab üht korrust.',
+    plantInfo: 'Siht {lo}–{hi} µmol/m²/s, DLI {a}–{b} mol/m²/päev {h} tunniga.', co2: 'Üle umbes 1000 µmol/m²/s tasub ära ainult lisatud CO₂-ga.', frNote: 'Sisesta ainult 400–700 nm osa; sügavpunane tuleb spektri eelseadistusest.',
+    wNone: 'Avatud ruum, peegeldus puudub', wDark: 'Tumedad või värvimata seinad', wWhite: 'Valged värvitud seinad', wMylar: 'Kasvutelk / Mylar', wShelf: 'Riiul püstakus: otsad jätkuvad, küljed lahti',
+    reflX: 'Otsad (vasak / parem) peegeldavad', reflY: 'Küljed (ees / taga) peegeldavad', margin: 'Kasvuala serv', shelfHint: 'Püstaku riiuli jaoks sea otsad 100 % (järgmine plokk kordab samu valgusteid) ja küljed 0 % (lahti). Serv jätab statistikast välja riba kõigil neljal küljel.', layRows: 'Ridu (piki pikkust)', layCols: 'Veerge (piki laiust)', exampleL: 'Laadi näide', exTent: 'Telk 1,2 m, üks 630 W latt-valgusti', exShelf: 'Püstaku riiul 3,7 × 1,08 m, torud 35 cm kõrgusel', coarse: 'Kaart tehti kiiruse huvides hõredamaks', tdir: 'kalde suund, ° (0 = +x, 90 = +y)',
+    typeNote: 'tüüpiline katteta LED-paneelidele', custom: 'Oma…',
+  }
+};
+let LANG = 'en';
+const t = (k) => (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k;
+const nm = (o) => (LANG === 'et' && o.et) ? o.et : o.name;
+
+/* ---------------- presets ---------------- */
+const SPECTRA = {
+  w2700:  { name: 'White 2700 K', et: 'Valge 2700 K', B: .08, G: .40, R: .49, FR: .03 },
+  w3000:  { name: 'White 3000 K', et: 'Valge 3000 K', B: .10, G: .40, R: .47, FR: .03 },
+  w3000r: { name: 'White 3000 K + 660 nm red', et: 'Valge 3000 K + 660 nm punane', B: .12, G: .34, R: .51, FR: .03 },
+  w3500r: { name: 'White 3500 K + 660 nm red', et: 'Valge 3500 K + 660 nm punane', B: .14, G: .37, R: .46, FR: .03 },
+  w4000:  { name: 'White 4000 K', et: 'Valge 4000 K', B: .18, G: .42, R: .38, FR: .02 },
+  w5000:  { name: 'White 5000 K daylight', et: 'Valge 5000 K päevavalgus', B: .22, G: .43, R: .33, FR: .02 },
+  w6000:  { name: 'White 6000 K', et: 'Valge 6000 K', B: .25, G: .44, R: .29, FR: .02 },
+  w6500:  { name: 'White 6500 K cool', et: 'Valge 6500 K külm', B: .26, G: .44, R: .28, FR: .02 },
+  rb:     { name: 'Red / blue 5:1 (blurple)', et: 'Punane / sinine 5:1', B: .16, G: .02, R: .80, FR: .02 },
+  hps:    { name: 'HPS (high-pressure sodium)', et: 'HPS (naatriumlamp)', B: .05, G: .48, R: .44, FR: .03 },
+  cmh:    { name: 'CMH 3100 K', et: 'CMH 3100 K', B: .17, G: .42, R: .37, FR: .04 },
+  fr:     { name: 'Far-red 730 nm', et: 'Sügavpunane 730 nm', B: 0, G: 0, R: .10, FR: .90 },
+  sun:    { name: 'Sunlight', et: 'Päikesevalgus', B: .22, G: .31, R: .31, FR: .16 },
+  custom: { name: 'Custom bands…', et: 'Oma ribad…', B: .15, G: .35, R: .45, FR: .05 },
+};
+const CCT_K = { 2700: 0.0140, 3000: 0.0137, 3500: 0.0136, 4000: 0.0135, 5000: 0.0132, 6000: 0.0131, 6500: 0.0130 };   // µmol/s per lumen, white LED, CRI 80 (CRI 90 gives ~8 % more photons per lumen)
+const CCT_SPEC = { 2700: 'w2700', 3000: 'w3000', 3500: 'w3500r', 4000: 'w4000', 5000: 'w5000', 6000: 'w6000', 6500: 'w6500' };
+const FIXTURES = [
+  { id: 'board100', name: 'LED board 100 W (3000 K + 660 nm)', et: 'LED-paneel 100 W (3000 K + 660 nm)', ppf: 270, watts: 100, beam: 120, len: 0.5, wid: 0.3, spec: 'w3000r' },
+  { id: 'board240', name: 'LED board 240 W (3500 K + 660 nm)', et: 'LED-paneel 240 W (3500 K + 660 nm)', ppf: 650, watts: 240, beam: 120, len: 0.6, wid: 0.55, spec: 'w3500r' },
+  { id: 'bar630',   name: 'LED 6-bar 630 W top light', et: 'LED 6 latiga 630 W pealtvalgusti', ppf: 1800, watts: 630, beam: 120, len: 1.1, wid: 1.05, spec: 'w3000r' },
+  { id: 'bar1000',  name: 'LED 8-bar 1000 W top light', et: 'LED 8 latiga 1000 W pealtvalgusti', ppf: 2900, watts: 1000, beam: 120, len: 1.2, wid: 1.1, spec: 'w3000r' },
+  { id: 'strip150', name: 'LED bar 1.2 m, 150 W', et: 'LED-latt 1,2 m, 150 W', ppf: 420, watts: 150, beam: 120, len: 1.2, wid: 0.06, spec: 'w4000' },
+  { id: 'triproof', name: 'Tri-proof tube 36 W, 6000 K (1.2 m)', et: 'Tri-proof toru 36 W, 6000 K (1,2 m)', mode: 'lm', lm: 6840, cct: 6000, watts: 36, beam: 175, beam90: 120, len: 1.23, wid: 0.07, spec: 'w6000' },
+  { id: 't8',       name: 'T8 LED tube 25 W, 3000 K (1.5 m)', et: 'T8 LED-toru 25 W, 3000 K (1,5 m)', mode: 'lm', lm: 3500, cct: 3000, watts: 25, beam: 120, len: 1.5, wid: 0.03, spec: 'w3000' },
+  { id: 't8_120_170', name: 'T8 LED tube 1.2 m, 18 W, 170 lm/W (measured: 2982 lm, 126° × 103°)', et: 'T8 LED-toru 1,2 m, 18 W, 170 lm/W (mõõdetud: 2982 lm, 126° × 103°)', mode: 'lm', lm: 2982, cct: 3000, watts: 18, beam: 126, beam90: 103, len: 1.2, wid: 0.03, spec: 'w3000' },
+  { id: 't8_120_200', name: 'T8 LED tube 1.2 m, 18 W, 195 lm/W (measured: 3440 lm, 126° × 103°)', et: 'T8 LED-toru 1,2 m, 18 W, 195 lm/W (mõõdetud: 3440 lm, 126° × 103°)', mode: 'lm', lm: 3440, cct: 4000, watts: 18, beam: 126, beam90: 103, len: 1.2, wid: 0.03, spec: 'w4000' },
+  { id: 'ghtop',    name: 'Greenhouse top light 1000 W (compact)', et: 'Kasvuhoone pealtvalgusti 1000 W', ppf: 2800, watts: 1000, beam: 120, len: 1.0, wid: 0.35, spec: 'w3000r' },
+  { id: 'hps1000',  name: 'HPS 1000 W DE with reflector', et: 'HPS 1000 W DE reflektoriga', ppf: 2100, watts: 1060, beam: 100, len: 0.5, wid: 0.3, spec: 'hps' },
+  { id: 'hps600',   name: 'HPS 600 W with reflector', et: 'HPS 600 W reflektoriga', ppf: 1100, watts: 640, beam: 100, len: 0.45, wid: 0.25, spec: 'hps' },
+  { id: 'cmh315',   name: 'CMH 315 W', et: 'CMH 315 W', ppf: 600, watts: 340, beam: 100, len: 0.4, wid: 0.3, spec: 'cmh' },
+  { id: 'fr30',     name: 'Far-red bar 30 W (730 nm)', et: 'Sügavpunane latt 30 W (730 nm)', ppf: 6, watts: 30, beam: 120, len: 1.0, wid: 0.05, spec: 'fr', note: 'frNote' },
+  { id: 'custom',   name: 'Custom lamp…', et: 'Oma valgusti…', ppf: 500, watts: 200, beam: 120, len: 0.5, wid: 0.5, spec: 'w3500r' },
+];
+const PLANTS = [
+  { id: 'seedlings', name: 'Seedlings & clones', et: 'Seemikud ja pistikud', lo: 100, hi: 250, dli: [6, 12], hours: 18 },
+  { id: 'microgreens', name: 'Microgreens', et: 'Mikrorohelised', lo: 100, hi: 200, dli: [8, 12], hours: 16 },
+  { id: 'lettuce', name: 'Lettuce & leafy greens', et: 'Salat ja lehtköögiviljad', lo: 200, hi: 350, dli: [12, 17], hours: 16 },
+  { id: 'herbs', name: 'Herbs (basil, parsley, mint)', et: 'Maitsetaimed (basiilik, petersell, münt)', lo: 250, hi: 450, dli: [14, 25], hours: 16 },
+  { id: 'spinach', name: 'Spinach, kale, chard', et: 'Spinat, lehtkapsas, mangold', lo: 200, hi: 350, dli: [12, 17], hours: 16 },
+  { id: 'strawberry', name: 'Strawberries', et: 'Maasikad', lo: 300, hi: 450, dli: [17, 22], hours: 16 },
+  { id: 'tomato', name: 'Tomato, pepper, cucumber (fruiting)', et: 'Tomat, paprika, kurk (viljuvad)', lo: 400, hi: 700, dli: [22, 35], hours: 16 },
+  { id: 'cannabis_veg', name: 'Cannabis — vegetative', et: 'Kanep — kasvufaas', lo: 400, hi: 650, dli: [25, 40], hours: 18 },
+  { id: 'cannabis_flower', name: 'Cannabis — flowering', et: 'Kanep — õitsemine', lo: 700, hi: 1000, dli: [30, 45], hours: 12, note: 'co2' },
+  { id: 'cannabis_co2', name: 'Cannabis — flowering with CO₂', et: 'Kanep — õitsemine CO₂-ga', lo: 1000, hi: 1500, dli: [40, 60], hours: 12 },
+  { id: 'flowers', name: 'Bedding flowers (petunia, marigold)', et: 'Suvelilled (petuunia, saialill)', lo: 200, hi: 400, dli: [10, 20], hours: 16 },
+  { id: 'succulents', name: 'Succulents & cacti', et: 'Sukulendid ja kaktused', lo: 300, hi: 600, dli: [15, 25], hours: 14 },
+  { id: 'orchids', name: 'Orchids (Phalaenopsis)', et: 'Orhideed (Phalaenopsis)', lo: 100, hi: 200, dli: [4, 8], hours: 12 },
+  { id: 'houseplants', name: 'Houseplants, low light (pothos, ferns)', et: 'Toataimed, vähe valgust (pothos, sõnajalad)', lo: 50, hi: 150, dli: [3, 8], hours: 12 },
+  { id: 'custom', name: 'Custom target…', et: 'Oma sihtväärtus…', lo: 300, hi: 600, dli: [15, 30], hours: 16 },
+];
+const WALLS = [
+  { id: 'none', name: 'Open space, no reflection', k: 'wNone', rx: 0, ry: 0 },
+  { id: 'dark', name: 'Dark or unpainted walls', k: 'wDark', rx: 0.3, ry: 0.3 },
+  { id: 'white', name: 'White painted walls', k: 'wWhite', rx: 0.75, ry: 0.75 },
+  { id: 'mylar', name: 'Grow tent / Mylar', k: 'wMylar', rx: 0.9, ry: 0.9 },
+  { id: 'shelf', name: 'Shelf in a rack: ends continue, sides open', k: 'wShelf', rx: 1, ry: 0 },
+];
+const MCCREE = { B: .73, G: .86, R: .97, FR: .30 };
+const LUX = [{ n: 'Sunlight', et: 'Päikesevalgus', f: 54 }, { n: 'HPS', f: 82 }, { n: 'Metal halide', et: 'Metallhaliid', f: 71 }, { n: 'CMH', f: 68 }, { n: 'White LED 3000 K (CRI 80)', et: 'Valge LED 3000 K (CRI 80)', f: 73 }, { n: 'White LED 4000 K (CRI 80)', et: 'Valge LED 4000 K (CRI 80)', f: 74 }, { n: 'White LED 5000–6500 K (CRI 80)', et: 'Valge LED 5000–6500 K (CRI 80)', f: 76 }, { n: 'White LED 3000 K (CRI 90)', et: 'Valge LED 3000 K (CRI 90)', f: 65 }, { n: 'Red/blue LED (very approximate)', et: 'Punane/sinine LED (väga umbkaudne)', f: 25 }];
+const TYPE_COLORS = ['#8be4ff', '#ffcf6b', '#ff8fb3', '#5ce8a6', '#c7a8ff', '#ffb27a'];
+
+/* ---------------- state ---------------- */
+let uid = 1;
+function mkType(p) {
+  const t = { id: 't' + (uid++), preset: p.id, name: p.name, et: p.et || '', mode: p.mode || 'ppf', ppf: p.ppf || 0, lm: p.lm || 0, cct: p.cct || 3000, effIn: p.effIn || 2.5, watts: p.watts, beam: p.beam, beam90: p.beam90 || 0, len: p.len, wid: p.wid, spec: p.spec, bands: { ...SPECTRA[p.spec] }, ies: null, note: p.note || '' };
+  resolvePPF(t); return t;
+}
+function resolvePPF(t) { if (t.mode === 'lm') t.ppf = Math.round((+t.lm || 0) * (CCT_K[t.cct] || 0.0145)); else if (t.mode === 'eff') t.ppf = Math.round((+t.effIn || 0) * (+t.watts || 0)); }
+function defaultState() {
+  const t = mkType(FIXTURES[2]);
+  return { version: 2, lang: 'en', plant: 'cannabis_flower', hours: 12, custLo: 300, custHi: 600, room: { w: 1.2, l: 1.2 }, wall: 'mylar', reflX: 0.9, reflY: 0.9, images: 2, hang: 0.45, mf: 0.9, tiers: 1, project: '', margin: 0, layRows: 0, layCols: 0,
+    types: [t], fixtures: [{ t: t.id, x: 0.6, y: 0.6, rot: 0, tilt: 0, tdir: 0 }], geek: false, cell: 2, subN: 24, ambient: 0, price: 0.2, currency: '€', view: 'ppfd', numbers: false, mccree: false };
+}
+let S = defaultState();
+let G = null, M = null, ST = null, sel = -1, dragging = null;
+const distCache = new Map();
+
+/* ---------------- photometry ---------------- */
+const nOf = (b) => { b = clamp(+b || 120, 2, 179.9); return b >= 179.8 ? 0 : Math.log(0.5) / Math.log(Math.cos(b / 2 * DEG)); };   // beam 120° -> n = 1 (Lambertian)
+function beamLUT(beamDeg) {
+  const n = nOf(beamDeg), k = (n + 1) / (2 * Math.PI), N = 1024, lut = new Float32Array(N + 1);
+  for (let i = 0; i <= N; i++) lut[i] = k * Math.pow(i / N, n);
+  return { lut, N, phi: false, NH: 1, along: true };
+}
+function beamLUT2(b0, b90) {   // elliptical cos-power: n(φ) = n0 cos²φ + n90 sin²φ, φ measured from the lamp's length axis
+  const n0 = nOf(b0), n90 = nOf(b90), N = 512, NH = 72, lut = new Float32Array((N + 1) * NH); let flux = 0; const ns = [];
+  for (let h = 0; h < NH; h++) { const ph = h * 360 / NH * DEG; const n = n0 * Math.cos(ph) ** 2 + n90 * Math.sin(ph) ** 2; ns.push(n); flux += (2 * Math.PI / NH) / (n + 1); }
+  for (let i = 0; i <= N; i++) for (let h = 0; h < NH; h++) lut[i * NH + h] = Math.pow(i / N, ns[h]) / flux;
+  return { lut, N, phi: true, NH, along: true };
+}
+function interpIdx(arr, x) { let i = 0; while (i < arr.length - 2 && arr[i + 1] < x) i++; const d = arr[i + 1] - arr[i]; return [i, d > 0 ? clamp((x - arr[i]) / d, 0, 1) : 0]; }
+function foldAz(a, mode) {
+  a = ((a % 360) + 360) % 360;
+  if (mode === 'sym') return 0;
+  if (mode === 'bilateral') return a > 180 ? 360 - a : a;
+  if (mode === 'quadrant') { a = a % 180; return a > 90 ? 180 - a : a; }
+  if (mode === 'c90') { if (a < 90) return 180 - a; if (a > 270) return 540 - a; return a; }
+  return a;
+}
+function evalTable(tab, theta, az) {
+  const V = tab.V, H = tab.H;
+  if (theta > V[V.length - 1] + 1e-6) return 0;
+  theta = Math.max(theta, V[0]);
+  const [vi, vf] = interpIdx(V, theta);
+  if (H.length === 1) { const c = tab.C[0]; return c[vi] * (1 - vf) + c[Math.min(vi + 1, c.length - 1)] * vf; }
+  const a = foldAz(az, tab.mode); const [hi, hf] = interpIdx(H, a);
+  const c0 = tab.C[hi], c1 = tab.C[Math.min(hi + 1, tab.C.length - 1)];
+  const v0 = c0[vi] * (1 - vf) + c0[Math.min(vi + 1, c0.length - 1)] * vf, v1 = c1[vi] * (1 - vf) + c1[Math.min(vi + 1, c1.length - 1)] * vf;
+  return v0 * (1 - hf) + v1 * hf;
+}
+function tableLUT(tab) {
+  let flux = 0; const dth = 1 * DEG, dph = 2 * DEG;
+  for (let th = 0.5; th < 180; th += 1) { const s = Math.sin(th * DEG) * dth * dph; for (let ph = 0; ph < 360; ph += 2) flux += evalTable(tab, th, ph) * s; }
+  if (!(flux > 0)) throw new Error('no light output in file');
+  const N = 512, NH = tab.mode === 'sym' ? 1 : 72, lut = new Float32Array((N + 1) * NH);
+  for (let i = 0; i <= N; i++) { const th = Math.acos(i / N) / DEG; for (let h = 0; h < NH; h++) lut[i * NH + h] = evalTable(tab, th, h * 360 / NH) / flux; }
+  return { lut, N, phi: NH > 1, NH, along: false };   // IES/LDT: C0 plane is across the lamp, C90 along it
+}
+function parseIES(text) {
+  const lines = text.split(/\r?\n/); let i = 0;
+  while (i < lines.length && !/^TILT=/i.test(lines[i].trim())) i++;
+  if (i >= lines.length) throw new Error('not an IES file');
+  const tilt = lines[i].trim().slice(5).trim().toUpperCase(); i++;
+  const nums = lines.slice(i).join(' ').trim().split(/[\s,]+/).map(Number).filter(x => !Number.isNaN(x)); let p = 0;
+  if (tilt === 'INCLUDE') { p++; const np = nums[p++]; p += 2 * np; }
+  p++; p++; const mult = nums[p++], nV = nums[p++], nH = nums[p++], ptype = nums[p++]; p += 4; p += 3;
+  const V = nums.slice(p, p + nV); p += nV; const H = nums.slice(p, p + nH); p += nH;
+  const C = []; for (let j = 0; j < nH; j++) { C.push(nums.slice(p, p + nV).map(x => x * mult)); p += nV; }
+  if (C.length !== nH || C[nH - 1].length !== nV) throw new Error('IES file is truncated');
+  if (ptype === 2 || ptype === 3) return typeABtoC(V, H, C, ptype);
+  const hmax = H[nH - 1]; let mode = 'full';
+  if (nH === 1) mode = 'sym'; else if (hmax <= 90.01) mode = 'quadrant'; else if (hmax <= 180.01) mode = 'bilateral';
+  if (mode === 'full' && hmax < 359.9) { H.push(H[0] + 360); C.push(C[0]); }
+  return { V, H, C, mode, warn: '' };
+}
+function typeABtoC(Vb, Hb, Cb, ptype) {
+  // Type B: polar axis = the luminaire's lateral axis. Direction for (H, V): along-lamp x = -cosV sinH, lateral y = sinV, down z = cosV cosH.
+  // Type A: the same with the lamp's axes swapped. Tables with H or V starting at 0 are symmetric about that axis.
+  const symH = Hb[0] >= -1e-6, symV = Vb[0] >= -1e-6;
+  const lookup = (h, v) => { if (symH) h = Math.abs(h); if (symV) v = Math.abs(v); if (h < Hb[0] || h > Hb[Hb.length - 1] || v < Vb[0] || v > Vb[Vb.length - 1]) return 0;
+    const [hi, hf] = interpIdx(Hb, h), [vi, vf] = interpIdx(Vb, v); const c0 = Cb[hi], c1 = Cb[Math.min(hi + 1, Cb.length - 1)];
+    return (c0[vi] * (1 - vf) + c0[Math.min(vi + 1, c0.length - 1)] * vf) * (1 - hf) + (c1[vi] * (1 - vf) + c1[Math.min(vi + 1, c1.length - 1)] * vf) * hf; };
+  const V = [], H = [], C = [];
+  for (let th = 0; th <= 90; th += 2.5) V.push(th);
+  for (let ph = 0; ph <= 360; ph += 5) { H.push(ph); const row = [];
+    for (const th of V) { let x = Math.sin(th * DEG) * Math.cos(ph * DEG), y = Math.sin(th * DEG) * Math.sin(ph * DEG); const z = Math.cos(th * DEG);
+      if (ptype === 3) { const t_ = x; x = y; y = t_; }   // Type A: lateral and longitudinal axes swapped
+      const v = Math.asin(clamp(y, -1, 1)) / DEG, cv = Math.max(1e-9, Math.cos(v * DEG)), h = Math.atan2(-x / cv, z / cv) / DEG;
+      row.push(lookup(h, v)); }
+    C.push(row); }
+  return { V, H, C, mode: 'full', warn: 'Type ' + (ptype === 2 ? 'B' : 'A') + ' photometry converted to Type C (C0 across the lamp, C90 along it).' };
+}
+function parseLDT(text) {
+  const L = text.split(/\r?\n/).map(s => s.trim()); if (L.length < 30) throw new Error('not an LDT file');
+  const Isym = +L[2], Mc = +L[3], Dc = +L[4], Ng = +L[5]; const n = +L[25] || 1; let p = 26 + 6 * n + 10;
+  const Cang = []; for (let j = 0; j < Mc; j++) Cang.push(+L[p++]); const Gang = []; for (let j = 0; j < Ng; j++) Gang.push(+L[p++]);
+  const stored = Isym === 0 ? Mc : Isym === 1 ? 1 : (Isym === 2 || Isym === 3) ? Mc / 2 + 1 : Mc / 4 + 1;
+  const C = []; for (let j = 0; j < stored; j++) { const row = []; for (let k = 0; k < Ng; k++) row.push(+L[p++]); C.push(row); }
+  if (C.some(r => r.some(x => Number.isNaN(x)))) throw new Error('LDT file is truncated');
+  let H = [], mode = 'full';
+  if (Isym === 1) { mode = 'sym'; H = [0]; }
+  else if (Isym === 2) { mode = 'bilateral'; for (let j = 0; j < stored; j++) H.push(j * Dc); }
+  else if (Isym === 3) { mode = 'c90'; for (let j = 0; j < stored; j++) H.push(90 + j * Dc); }
+  else if (Isym === 4) { mode = 'quadrant'; for (let j = 0; j < stored; j++) H.push(j * Dc); }
+  else { H = Cang.slice(); H.push(H[0] + 360); C.push(C[0]); }
+  return { V: Gang, H, C, mode, warn: '' };
+}
+function getDist(t) {
+  const key = t.id + ':' + (t.ies ? 'ies:' + t.ies.name + ':' + t.ies.V.length + ':' + t.ies.H.length : 'beam:' + t.beam + ':' + (t.beam90 || 0));
+  let d = distCache.get(key);
+  if (!d) { d = t.ies ? tableLUT(t.ies) : (t.beam90 > 0 && Math.abs(t.beam90 - t.beam) > 0.5 ? beamLUT2(t.beam, t.beam90) : beamLUT(t.beam)); distCache.set(key, d); }
+  return d;
+}
+const bands = (t) => t.spec === 'custom' ? t.bands : SPECTRA[t.spec];
+
+/* ---------------- sources and grid ---------------- */
+function buildSources(type, H, room, K, subN) {
+  const out = []; const len = Math.max(0.01, +type.len || 0.01), wid = Math.max(0.01, +type.wid || 0.01);
+  const spacing = Math.max(0.05, H / 3);
+  let nu = clamp(Math.ceil(len / spacing), 1, 8), nv = clamp(Math.ceil(wid / spacing), 1, 6);
+  while (nu * nv > subN) { if (nu >= nv && nu > 1) nu--; else if (nv > 1) nv--; else break; }
+  const w0 = 1 / (nu * nv), rx = clamp(+S.reflX || 0, 0, 1), ry = clamp(+S.reflY || 0, 0, 1);
+  for (const f of S.fixtures) {
+    if (f.t !== type.id) continue;
+    const tau = (f.tilt || 0) * DEG, az = (f.tdir || 0) * DEG, rot = (f.rot || 0) * DEG;
+    const n = [Math.sin(tau) * Math.cos(az), Math.sin(tau) * Math.sin(az), -Math.cos(tau)];
+    let tv = [Math.cos(rot), Math.sin(rot), 0]; const dn = tv[0] * n[0] + tv[1] * n[1] + tv[2] * n[2];
+    tv = [tv[0] - dn * n[0], tv[1] - dn * n[1], tv[2] - dn * n[2]]; const tl = Math.hypot(tv[0], tv[1], tv[2]) || 1; tv = tv.map(v => v / tl);
+    for (let m = -K; m <= K; m++) for (let q = -K; q <= K; q++) {
+      if (Math.abs(m) + Math.abs(q) > K) continue;
+      const w = w0 * Math.pow(rx, Math.abs(m)) * Math.pow(ry, Math.abs(q)); if (w <= 1e-6) continue;
+      const fx = m % 2 === 0 ? 1 : -1, fy = q % 2 === 0 ? 1 : -1;
+      const cx = m % 2 === 0 ? f.x + m * room.w : -f.x + (m + 1) * room.w;
+      const cy = q % 2 === 0 ? f.y + q * room.l : -f.y + (q + 1) * room.l;
+      const nn = [n[0] * fx, n[1] * fy, n[2]], tt = [tv[0] * fx, tv[1] * fy, tv[2]];
+      const ss = [nn[1] * tt[2] - nn[2] * tt[1], nn[2] * tt[0] - nn[0] * tt[2], nn[0] * tt[1] - nn[1] * tt[0]];
+      for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+        const u = nu === 1 ? 0 : -len / 2 + len * (i + 0.5) / nu, v = nv === 1 ? 0 : -wid / 2 + wid * (j + 0.5) / nv;
+        out.push(cx + u * tt[0] + v * ss[0], cy + u * tt[1] + v * ss[1], Math.max(0.01, H + u * tt[2] + v * ss[2]), nn[0], nn[1], nn[2], tt[0], tt[1], tt[2], ss[0], ss[1], ss[2], w);
+      }
+    }
+  }
+  return new Float32Array(out);
+}
+function gridDims(cellCm) {
+  const W = S.room.w, L = S.room.l; let cell = Math.max(0.5, +cellCm || 2) / 100;
+  let nx = clamp(Math.round(W / cell), 20, 900), ny = clamp(Math.round(L / cell), 20, 900);
+  const srcs = S.types.map(ty => buildSources(ty, S.hang, S.room, S.images, S.subN)); const ns = srcs.reduce((a, s) => a + s.length / 13, 0);
+  let coarse = false;
+  while (nx * ny * Math.max(1, ns) > 140e6 && (nx > 20 || ny > 20)) { cell *= 1.5; nx = clamp(Math.round(W / cell), 20, 900); ny = clamp(Math.round(L / cell), 20, 900); coarse = true; }
+  return { nx, ny, srcs, coarse };
+}
+function computeGrids(cellCm) {
+  const W = S.room.w, L = S.room.l; const { nx, ny, srcs, coarse } = gridDims(cellCm); const dx = W / nx, dy = L / ny;
+  if (coarse && cellCm === +S.cell && !computeGrids.warned) { computeGrids.warned = true; toast(t('coarse')); }
+  const grids = S.types.map(() => new Float32Array(nx * ny));
+  S.types.forEach((type, ti) => {
+    let dist; try { dist = getDist(type); } catch (e) { dist = beamLUT(type.beam); }
+    const src = srcs[ti], g = grids[ti];
+    const lut = dist.lut, NL = dist.N, phi = dist.phi, NH = dist.NH, along = dist.along, ns = src.length / 13, hstep = 360 / NH;
+    for (let j = 0; j < ny; j++) {
+      const y = (j + 0.5) * dy;
+      for (let i = 0; i < nx; i++) {
+        const x = (i + 0.5) * dx; let E = 0;
+        for (let s = 0; s < ns; s++) {
+          const o = s * 13, ddx = x - src[o], ddy = y - src[o + 1], ddz = -src[o + 2];          // vector from emitter to canopy point
+          const r2 = ddx * ddx + ddy * ddy + ddz * ddz, inv = 1 / Math.sqrt(r2);
+          const c = (ddx * src[o + 3] + ddy * src[o + 4] + ddz * src[o + 5]) * inv; if (c <= 0) continue;   // cos of angle from the beam axis
+          const ca = -ddz * inv; if (ca <= 0) continue;                                              // cos of incidence on the horizontal canopy
+          let I;
+          if (!phi) I = lut[(c * NL) | 0];
+          else {
+            const a = ddx * src[o + 6] + ddy * src[o + 7] + ddz * src[o + 8], b = ddx * src[o + 9] + ddy * src[o + 10] + ddz * src[o + 11];
+            let ph = (along ? Math.atan2(b, a) : Math.atan2(a, b)) / DEG; if (ph < 0) ph += 360;
+            I = lut[((c * NL) | 0) * NH + (Math.round(ph / hstep) % NH)];
+          }
+          E += src[o + 12] * I * ca / r2;
+        }
+        g[j * nx + i] = E;
+      }
+    }
+  });
+  return { nx, ny, dx, dy, grids };
+}
+function deriveMaps(G) {
+  const n = G.nx * G.ny, ppfd = new Float32Array(n), epar = new Float32Array(n), B = new Float32Array(n), Gn = new Float32Array(n), R = new Float32Array(n), FR = new Float32Array(n), mf = clamp(+S.mf || 1, 0.1, 1);
+  S.types.forEach((t, ti) => {
+    const sp = bands(t), ppf = Math.max(0, +t.ppf || 0) * mf, tot = ppf / Math.max(0.01, 1 - sp.FR), g = G.grids[ti];
+    for (let k = 0; k < n; k++) { const v = g[k]; ppfd[k] += v * ppf; epar[k] += v * tot; B[k] += v * tot * sp.B; Gn[k] += v * tot * sp.G; R[k] += v * tot * sp.R; FR[k] += v * tot * sp.FR; }
+  });
+  return { ppfd, epar, B, G: Gn, R, FR };
+}
+function plant() { const p = PLANTS.find(p => p.id === S.plant) || PLANTS[0]; return p.id === 'custom' ? { ...p, lo: +S.custLo, hi: +S.custHi } : p; }
+function stats(G, M) {
+  const pl = plant(), mg = clamp(+S.margin || 0, 0, 100) / 100; let n = 0, sum = 0, min = Infinity, max = -Infinity, sq = 0, inr = 0, below = 0, above = 0, sB = 0, sG = 0, sR = 0, sFR = 0, sE = 0;
+  const i0 = Math.min(G.nx - 1, Math.floor(mg / G.dx)), i1 = Math.max(i0, G.nx - 1 - i0), j0 = Math.min(G.ny - 1, Math.floor(mg / G.dy)), j1 = Math.max(j0, G.ny - 1 - j0);
+  for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) { const k = j * G.nx + i, v = M.ppfd[k]; n++; sum += v; sq += v * v; if (v < min) min = v; if (v > max) max = v; if (v < pl.lo) below++; else if (v > pl.hi) above++; else inr++; sB += M.B[k]; sG += M.G[k]; sR += M.R[k]; sFR += M.FR[k]; sE += M.epar[k]; }
+  const avg = sum / n, sd = Math.sqrt(Math.max(0, sq / n - avg * avg)), area = Math.max(0.01, S.room.w - 2 * mg) * Math.max(0.01, S.room.l - 2 * mg), tiers = clamp(Math.round(+S.tiers) || 1, 1, 50);
+  const ppfTotal = S.fixtures.reduce((a, f) => { const t = S.types.find(t => t.id === f.t); return a + (t ? +t.ppf || 0 : 0); }, 0) * clamp(+S.mf || 1, 0.1, 1);
+  const watts = S.fixtures.reduce((a, f) => { const t = S.types.find(t => t.id === f.t); return a + (t ? +t.watts || 0 : 0); }, 0);
+  const eparAvg = sE / n, tb = sB + sG + sR + sFR || 1;
+  const ypfd = (sB * MCCREE.B + sG * MCCREE.G + sR * MCCREE.R + sFR * MCCREE.FR) / n;
+  return { avg, min, max, cv: avg > 0 ? sd / avg : 0, unif: avg > 0 ? min / avg : 0, inr: inr / n, below: below / n, above: above / n, dli: avg * S.hours * 0.0036 + +S.ambient, dliMin: min * S.hours * 0.0036 + +S.ambient,
+    epar: eparAvg, ypfd, capture: ppfTotal > 0 ? avg * area / ppfTotal : 0, ppfTotal, watts: watts * tiers, eff: watts > 0 ? ppfTotal / watts : 0, kwh: watts * tiers * S.hours / 1000, tiers,
+    fB: sB / tb, fG: sG / tb, fR: sR / tb, fFR: sFR / tb, rfr: sFR > 0 ? sR / sFR : Infinity, pl };
+}
+function recalc(full = true) {
+  if (!S.types.length) { G = null; M = null; ST = null; render(); return; }
+  G = computeGrids(full ? +S.cell : Math.max(+S.cell * 3, 4)); M = deriveMaps(G); ST = stats(G, M); render(); updateResults(); persist();
+}
+
+/* ---------------- colour maps ---------------- */
+const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+function buildCmap(stops) { const m = new Uint8ClampedArray(256 * 3); for (let i = 0; i < 256; i++) { const x = i / 255; let k = 0; while (k < stops.length - 2 && stops[k + 1][0] < x) k++; const [a, ca] = stops[k], [b, cb] = stops[k + 1], f = clamp((x - a) / (b - a || 1), 0, 1), A = hex(ca), Bc = hex(cb); for (let c = 0; c < 3; c++) m[i * 3 + c] = A[c] + (Bc[c] - A[c]) * f; } return m; }
+const CM_ICE = buildCmap([[0, '#071024'], [.15, '#10306a'], [.35, '#1f63c3'], [.55, '#2fb8ea'], [.72, '#8df2ff'], [.86, '#e8fcff'], [1, '#ffe9a0']]);
+const CM_COOL = buildCmap([[0, '#071024'], [.5, '#1d6fd0'], [1, '#9be9ff']]);
+const alpha = (h, a) => { const v = hex(h); return `rgba(${v[0]},${v[1]},${v[2]},${a})`; };
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/* Themes: each has its natural light/dark mode and its own heat-map ramps (seq for PPFD/DLI, cool for blue % and R:FR). All ramps run dark → light so the map reads the same way in every theme. */
+const PALETTES = {
+  ice: { mode: 'dark', seq: CM_ICE, cool: CM_COOL },
+  moss: { mode: 'dark', seq: buildCmap([[0, '#06130b'], [.15, '#0d3a22'], [.35, '#1b7a3e'], [.55, '#3cc46c'], [.72, '#9af2a6'], [.86, '#eaffe8'], [1, '#fff0a0']]), cool: buildCmap([[0, '#06130b'], [.5, '#1d8a52'], [1, '#b8f5c8']]) },
+  sand: { mode: 'light', seq: buildCmap([[0, '#160f07'], [.15, '#4a2a10'], [.35, '#9a4f1c'], [.55, '#d9893a'], [.72, '#f4c988'], [.86, '#fae8cc'], [1, '#fffdf5']]), cool: buildCmap([[0, '#160f07'], [.5, '#a8641e'], [1, '#f9dfb0']]) },
+  dusk: { mode: 'dark', seq: buildCmap([[0, '#0b0514'], [.15, '#2a1458'], [.35, '#5c2bb0'], [.55, '#a24fe0'], [.72, '#e49bff'], [.86, '#f9e9ff'], [1, '#ffe9a0']]), cool: buildCmap([[0, '#0b0514'], [.5, '#6d3fd0'], [1, '#e6c8ff']]) },
+};
+let PALETTE = 'ice';
+const CM = () => PALETTES[PALETTE] || PALETTES.ice;
+function applyPalette(p, withMode, draw) {
+  PALETTE = PALETTES[p] ? p : 'ice'; const r = document.documentElement; r.setAttribute('data-palette', PALETTE);
+  $$('#palettes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pal === PALETTE ? 'true' : 'false'));
+  if (withMode) { r.setAttribute('data-theme', CM().mode); try { localStorage.setItem('growlight.theme', CM().mode); } catch (e) {} }
+  try { localStorage.setItem('growlight.palette', PALETTE); } catch (e) {}
+  if (draw && ST) render();
+}
+const niceCeil = (v) => { if (!(v > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; const n = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10; return n * p; };
+function viewSpec() {
+  const pl = ST.pl;
+  switch (S.view) {
+    case 'target': return { kind: 'target', label: t('vTarget'), lo: pl.lo, hi: pl.hi };
+    case 'dli': return { kind: 'seq', data: (k) => M.ppfd[k] * S.hours * 0.0036 + +S.ambient, max: niceCeil(Math.max(ST.dli * 1.2, pl.dli[1] * 1.1, ST.max * S.hours * 0.0036 + +S.ambient)), cmap: CM().seq, label: t('lDli'), band: pl.dli, dec: 1 };
+    case 'blue': return { kind: 'seq', data: (k) => M.epar[k] > 0 ? 100 * M.B[k] / M.epar[k] : 0, max: 40, cmap: CM().cool, label: t('lBlue'), dec: 0 };
+    case 'rfr': return { kind: 'seq', data: (k) => M.FR[k] > 0 ? Math.min(30, M.R[k] / M.FR[k]) : 30, max: 30, cmap: CM().cool, label: t('lRfr'), dec: 1 };
+    default: return { kind: 'seq', data: (k) => M.ppfd[k], max: niceCeil(Math.max(ST.max * 1.05, pl.hi * 1.1)), cmap: CM().seq, label: t('lPpfd'), band: [pl.lo, pl.hi], dec: 0 };
+  }
+}
+function cellColor(vs, k, out) {
+  if (vs.kind === 'target') {
+    const v = M.ppfd[k];
+    if (v < vs.lo) { const f = clamp(v / vs.lo, 0, 1); out[0] = 20 + 50 * f; out[1] = 40 + 90 * f; out[2] = 90 + 150 * f; }
+    else if (v <= vs.hi) { out[0] = 60; out[1] = 200; out[2] = 120; }
+    else { const f = clamp((v - vs.hi) / (vs.hi * 0.5), 0, 1); out[0] = 240; out[1] = 150 - 100 * f; out[2] = 60 - 40 * f; }
+  } else { const i = clamp(Math.round(255 * vs.data(k) / vs.max), 0, 255); out[0] = vs.cmap[i * 3]; out[1] = vs.cmap[i * 3 + 1]; out[2] = vs.cmap[i * 3 + 2]; }
+}
+
+/* ---------------- rendering ---------------- */
+const stage = $('#stage'), legend = $('#legend'), ctx = stage.getContext('2d');
+const off = document.createElement('canvas');
+function stageGeom() {
+  const wrap = stage.parentElement, cssW = Math.max(200, wrap.clientWidth), ratio = S.room.l / S.room.w;
+  let cssH = cssW * ratio; const maxH = Math.max(260, window.innerHeight * 0.62); let w = cssW, h = cssH;
+  if (cssH > maxH) { h = maxH; w = maxH / ratio; }
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  return { w, h, dpr, pad: 28 * dpr };
+}
+function render() {
+  const g = stageGeom(); stage.style.width = g.w + 'px'; stage.style.height = (g.h + 52) + 'px';
+  stage.width = Math.round(g.w * g.dpr); stage.height = Math.round((g.h + 52) * g.dpr);
+  const css = getComputedStyle(document.documentElement), col = (n) => css.getPropertyValue(n).trim(), fb = css.getPropertyValue('--font-body'), fd = css.getPropertyValue('--font-display');
+  ctx.fillStyle = col('--bg'); ctx.fillRect(0, 0, stage.width, stage.height);
+  const pad = g.pad, mapW = stage.width - 2 * pad, mapH = stage.height - 2 * pad - 24 * g.dpr, ppm = mapW / S.room.w; render.g = { ...g, pad, mapW, mapH, ppm };
+  if (!G) { ctx.fillStyle = col('--muted'); ctx.font = `${14 * g.dpr}px ${fb}`; ctx.fillText(t('addLamp'), pad, pad + 20 * g.dpr); return; }
+  const vs = viewSpec();
+  off.width = G.nx; off.height = G.ny; const octx = off.getContext('2d'), img = octx.createImageData(G.nx, G.ny), px = img.data, rgb = [0, 0, 0];
+  for (let j = 0; j < G.ny; j++) for (let i = 0; i < G.nx; i++) { const k = j * G.nx + i, o = ((G.ny - 1 - j) * G.nx + i) * 4; cellColor(vs, k, rgb); px[o] = rgb[0]; px[o + 1] = rgb[1]; px[o + 2] = rgb[2]; px[o + 3] = 255; }
+  octx.putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.save(); ctx.beginPath(); ctx.roundRect(pad, pad, mapW, mapH, 6 * g.dpr); ctx.clip(); ctx.drawImage(off, pad, pad, mapW, mapH); ctx.restore();
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 1 * g.dpr; const stepM = S.room.w > 4 || S.room.l > 4 ? 1 : 0.5;
+  for (let x = stepM; x < S.room.w - 1e-6; x += stepM) { const X = pad + x * ppm; ctx.beginPath(); ctx.moveTo(X, pad); ctx.lineTo(X, pad + mapH); ctx.stroke(); }
+  for (let y = stepM; y < S.room.l - 1e-6; y += stepM) { const Y = pad + mapH - y * ppm; ctx.beginPath(); ctx.moveTo(pad, Y); ctx.lineTo(pad + mapW, Y); ctx.stroke(); }
+  if (S.numbers && vs.kind !== 'target') {
+    const target = Math.max(6, Math.min(14, Math.round(mapW / (34 * g.dpr)))); const cellsX = Math.min(G.nx, target), cellsY = Math.max(2, Math.round(cellsX * G.ny / G.nx));
+    ctx.font = `${10 * g.dpr}px ${fb}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let a = 0; a < cellsX; a++) for (let b = 0; b < cellsY; b++) {
+      const i = Math.min(G.nx - 1, Math.floor((a + 0.5) * G.nx / cellsX)), j = Math.min(G.ny - 1, Math.floor((b + 0.5) * G.ny / cellsY)), k = j * G.nx + i, v = vs.data(k);
+      const X = pad + (i + 0.5) * G.dx * ppm, Y = pad + mapH - (j + 0.5) * G.dy * ppm; const s = fmt(v, vs.dec);
+      ctx.fillStyle = 'rgba(0,0,0,0.45)'; const tw = ctx.measureText(s).width + 6 * g.dpr; ctx.fillRect(X - tw / 2, Y - 7 * g.dpr, tw, 14 * g.dpr); ctx.fillStyle = '#fff'; ctx.fillText(s, X, Y);
+    }
+  }
+  if (+S.margin > 0) { const mg = +S.margin / 100 * ppm; ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1 * g.dpr; ctx.setLineDash([4 * g.dpr, 4 * g.dpr]); ctx.strokeRect(pad + mg, pad + mg, mapW - 2 * mg, mapH - 2 * mg); ctx.setLineDash([]); }
+  S.fixtures.forEach((f, idx) => {
+    const ty = S.types.find(t => t.id === f.t); if (!ty) return; const ti = S.types.indexOf(ty), c = TYPE_COLORS[ti % TYPE_COLORS.length];
+    const X = pad + f.x * ppm, Y = pad + mapH - f.y * ppm, L = Math.max(0.05, ty.len) * ppm, Wd = Math.max(0.03, ty.wid) * ppm;
+    ctx.save(); ctx.translate(X, Y); ctx.rotate(-(f.rot || 0) * DEG);
+    ctx.fillStyle = idx === sel ? c : 'rgba(255,255,255,0.14)'; ctx.strokeStyle = c; ctx.lineWidth = (idx === sel ? 3 : 2) * g.dpr; ctx.setLineDash(idx === sel ? [] : [6 * g.dpr, 4 * g.dpr]);
+    ctx.beginPath(); ctx.roundRect(-L / 2, -Wd / 2, L, Wd, 4 * g.dpr); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = idx === sel ? '#06283a' : c; ctx.font = `700 ${11 * g.dpr}px ${fd}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(idx + 1), 0, 0);
+    if (f.tilt) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2 * g.dpr; ctx.beginPath(); ctx.moveTo(0, 0); const a = (f.tdir - f.rot) * DEG; ctx.lineTo(Math.cos(a) * 18 * g.dpr, -Math.sin(a) * 18 * g.dpr); ctx.stroke(); }
+    ctx.restore();
+  });
+  ctx.strokeStyle = col('--line-2'); ctx.lineWidth = 1.5 * g.dpr; ctx.beginPath(); ctx.roundRect(pad, pad, mapW, mapH, 6 * g.dpr); ctx.stroke();
+  ctx.fillStyle = col('--muted'); ctx.font = `${11 * g.dpr}px ${fb}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(`${fmt(S.room.w, 2)} m`, pad + mapW / 2, pad + mapH + 12 * g.dpr);
+  ctx.save(); ctx.translate(pad / 2, pad + mapH / 2); ctx.rotate(-Math.PI / 2); ctx.fillText(`${fmt(S.room.l, 2)} m`, 0, 0); ctx.restore();
+  ctx.textAlign = 'left'; ctx.fillText(vs.label + (S.view === 'target' ? `  ·  ${t('below')} ${ST.pl.lo} / ${t('inRange')} / ${t('above')} ${ST.pl.hi} µmol/m²/s` : ''), pad, pad + mapH + 32 * g.dpr);
+  drawLegend(vs, col, fb, g.dpr); drawSections(col, fb, g.dpr);
+}
+function drawLegend(vs, col, fb, dpr) {
+  const W = legend.clientWidth || 300; legend.width = W * dpr; legend.height = 46 * dpr; const c = legend.getContext('2d'); c.clearRect(0, 0, legend.width, legend.height);
+  const x0 = 8 * dpr, w = legend.width - 16 * dpr, y0 = 6 * dpr, h = 12 * dpr;
+  c.font = `${11 * dpr}px ${fb}`; c.textBaseline = 'top';
+  if (vs.kind === 'target') {
+    const segs = [['#1a4a9a', `${t('below')} ${vs.lo}`], ['#3cc878', `${vs.lo}–${vs.hi} ${t('inRange')}`], ['#f0963c', `${t('above')} ${vs.hi}`]]; const sw = w / 3; c.textAlign = 'center';
+    segs.forEach((s, i) => { c.fillStyle = s[0]; c.fillRect(x0 + i * sw, y0, sw - 2 * dpr, h); c.fillStyle = col('--muted'); c.fillText(s[1], x0 + i * sw + sw / 2, y0 + h + 6 * dpr); });
+    return;
+  }
+  for (let i = 0; i < w; i++) { const k = Math.round(255 * i / w); c.fillStyle = `rgb(${vs.cmap[k * 3]},${vs.cmap[k * 3 + 1]},${vs.cmap[k * 3 + 2]})`; c.fillRect(x0 + i, y0, 1.5, h); }
+  c.fillStyle = col('--muted');
+  for (let k = 0; k <= 5; k++) { const v = vs.max * k / 5, X = x0 + w * k / 5; c.textAlign = k === 0 ? 'left' : k === 5 ? 'right' : 'center'; c.fillText(fmt(v, vs.dec), X, y0 + h + 4 * dpr); }
+  if (vs.band) { const [a, b] = vs.band; const xa = x0 + w * clamp(a / vs.max, 0, 1), xb = x0 + w * clamp(b / vs.max, 0, 1); c.strokeStyle = col('--good'); c.lineWidth = 2 * dpr; c.beginPath(); c.moveTo(xa, y0 - 3 * dpr); c.lineTo(xa, y0 + h + 3 * dpr); c.moveTo(xb, y0 - 3 * dpr); c.lineTo(xb, y0 + h + 3 * dpr); c.moveTo(xa, y0 - 2 * dpr); c.lineTo(xb, y0 - 2 * dpr); c.stroke(); c.textAlign = 'center'; c.fillStyle = col('--good'); c.fillText(t('target'), (xa + xb) / 2, y0 + h + 18 * dpr); }
+}
+function drawSections(col, fb, dpr) {
+  const draw = (cv, vals, len, title) => {
+    const W = cv.clientWidth || 300, H = 150; cv.width = W * dpr; cv.height = H * dpr; const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height);
+    const pl = ST.pl, vmax = niceCeil(Math.max(...vals, pl.hi) * 1.1), x0 = 36 * dpr, y0 = 10 * dpr, w = cv.width - x0 - 10 * dpr, h = cv.height - y0 - 24 * dpr;
+    c.fillStyle = alpha(col('--good'), 0.12); c.fillRect(x0, y0 + h * (1 - pl.hi / vmax), w, h * (pl.hi - pl.lo) / vmax);
+    c.strokeStyle = col('--line'); c.lineWidth = dpr; for (let k = 0; k <= 4; k++) { const Y = y0 + h * k / 4; c.beginPath(); c.moveTo(x0, Y); c.lineTo(x0 + w, Y); c.stroke(); }
+    c.fillStyle = col('--muted'); c.font = `${10 * dpr}px ${fb}`; c.textAlign = 'right'; c.textBaseline = 'middle';
+    for (let k = 0; k <= 4; k++) c.fillText(fmt(vmax * (1 - k / 4)), x0 - 4 * dpr, y0 + h * k / 4);
+    c.beginPath(); vals.forEach((v, i) => { const X = x0 + w * (i + 0.5) / vals.length, Y = y0 + h * (1 - clamp(v / vmax, 0, 1)); i ? c.lineTo(X, Y) : c.moveTo(X, Y); });
+    c.strokeStyle = col('--accent'); c.lineWidth = 2 * dpr; c.stroke(); c.lineTo(x0 + w, y0 + h); c.lineTo(x0, y0 + h); c.closePath(); c.fillStyle = alpha(col('--accent'), 0.12); c.fill();
+    c.fillStyle = col('--muted'); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.fillText(title, x0, cv.height - 8 * dpr); c.textAlign = 'right'; c.fillText(`${fmt(len, 2)} m`, x0 + w, cv.height - 8 * dpr);
+  };
+  const jm = Math.floor(G.ny / 2), im = Math.floor(G.nx / 2);
+  draw($('#secX'), Array.from({ length: G.nx }, (_, i) => M.ppfd[jm * G.nx + i]), S.room.w, t('secX'));
+  draw($('#secY'), Array.from({ length: G.ny }, (_, j) => M.ppfd[j * G.nx + im]), S.room.l, t('secY'));
+}
+
+/* ---------------- results panel ---------------- */
+const pill = (cls, text) => `<span class="pill ${cls}"><span class="dot"></span>${text}</span>`;
+function updateResults() {
+  if (!ST) return; const s = ST, pl = s.pl, cur = S.currency || '';
+  $('#r_avg').textContent = fmt(s.avg); $('#r_unif').textContent = fmt(s.unif, 2); $('#r_dli').textContent = fmt(s.dli, 1); $('#r_cov').textContent = fmt(s.inr * 100) + ' %';
+  $('#r_minmax').textContent = `${fmt(s.min)} / ${fmt(s.max)}`; $('#r_cv').textContent = fmt(s.cv * 100) + ' %'; $('#r_epar').textContent = fmt(s.epar) + ' µmol/m²/s';
+  $('#r_ypfd_l').hidden = !S.mccree; $('#r_ypfd').hidden = !S.mccree; $('#r_ypfd').textContent = fmt(s.ypfd) + ' µmol/m²/s';
+  $('#r_capture').textContent = fmt(s.capture * 100) + ' % ' + t('ofPpf'); $('#r_belowabove').textContent = `${fmt(s.below * 100)} % / ${fmt(s.above * 100)} %`;
+  $('#specBar').innerHTML = [['#4f8cff', s.fB], ['#5fe08a', s.fG], ['#ff5c5c', s.fR], ['#9b4dca', s.fFR]].map(([c, f]) => `<span style="width:${(f * 100).toFixed(1)}%;background:${c}"></span>`).join('');
+  $('#r_bgr').textContent = `${fmt(s.fB * 100)} · ${fmt(s.fG * 100)} · ${fmt(s.fR * 100)} %`; $('#r_rfr').textContent = isFinite(s.rfr) ? fmt(s.rfr, 1) + ' : 1' : t('noFr'); $('#r_fr').textContent = fmt(s.fFR * 100, 1) + ' %';
+  $('#r_watts').textContent = fmt(s.watts) + ' W'; $('#r_eff').textContent = fmt(s.eff, 2) + ' µmol/J'; $('#r_kwh').textContent = fmt(s.kwh, 1) + ' kWh';
+  $('#r_cost').textContent = `${cur} ${fmt(s.kwh * S.price, 2)} · ${cur} ${fmt(s.kwh * S.price * 30, 0)}`; $('#r_heat').textContent = `${fmt(s.watts)} W · ${fmt(s.watts * 3.412)} BTU/h`;
+  $('#tiersNote').hidden = s.tiers <= 1; $('#tiersNote').textContent = s.tiers > 1 ? `${s.tiers} ${t('tiersNote')}` : '';
+  $('#t_ppfd').textContent = `${pl.lo} – ${pl.hi} µmol/m²/s`; $('#t_dli').textContent = `${pl.dli[0]} – ${pl.dli[1]} mol/m²/${LANG === 'et' ? 'päev' : 'day'}`; $('#t_hours').textContent = `${S.hours} h`; $('#t_note').textContent = pl.note ? t(pl.note) : '';
+  const v = [];
+  if (s.inr >= 0.8) v.push(pill('good', t('onTarget'))); else if (s.avg < pl.lo) v.push(pill('bad', t('tooDim'))); else if (s.avg > pl.hi) v.push(pill('warn', t('tooBright'))); else v.push(pill('warn', t('unevenC')));
+  v.push(s.unif >= 0.7 ? pill('good', t('even')) : s.unif >= 0.5 ? pill('warn', t('patchy')) : pill('bad', t('uneven') + ': ' + fmt(s.unif, 2)));
+  v.push(s.dli >= pl.dli[0] && s.dli <= pl.dli[1] ? pill('good', t('dliIn')) : s.dli < pl.dli[0] ? pill('warn', t('dliLow')) : pill('warn', t('dliHigh')));
+  if (s.eff > 0) v.push(pill(s.eff >= 2.5 ? 'good' : s.eff >= 1.8 ? 'warn' : 'bad', fmt(s.eff, 1) + ' µmol/J'));
+  $('#verdicts').innerHTML = v.join('');
+}
+
+/* ---------------- setup panel ---------------- */
+function fillSelect(sel, items, val, key = 'id', label = (i) => i.name) { sel.innerHTML = items.map(i => `<option value="${i[key]}">${label(i)}</option>`).join(''); sel.value = val; }
+function typeHint(ty) {
+  if (ty.note) return t(ty.note) === ty.note ? (I18N.en[ty.note] || ty.note) : t(ty.note);
+  const eff = `${fmt((+ty.ppf || 0) / Math.max(1, +ty.watts || 1), 2)} µmol/J`;
+  const beam = ty.ies ? t('beamFromFile') : (ty.beam90 > 0 && Math.abs(ty.beam90 - ty.beam) > 0.5) ? `${ty.beam}° × ${ty.beam90}° ${t('beamAsym')}` : (ty.beam >= 115 && ty.beam <= 125 ? t('lambert') : ty.beam + t('beamDeg'));
+  return `${eff} · PPF ${fmt(ty.ppf)} µmol/s · ${beam}`;
+}
+function renderTypes() {
+  const box = $('#types'); box.innerHTML = '';
+  S.types.forEach((ty, ti) => {
+    const count = S.fixtures.filter(f => f.t === ty.id).length, el = document.createElement('div'); el.className = 'card sub type'; el.dataset.id = ty.id;
+    const specOpts = Object.entries(SPECTRA).map(([k, v]) => `<option value="${k}"${k === ty.spec ? ' selected' : ''}>${nm(v)}</option>`).join('');
+    const presetOpts = FIXTURES.map(p => `<option value="${p.id}"${p.id === ty.preset ? ' selected' : ''}>${nm(p)}</option>`).join('');
+    const cctOpts = Object.keys(CCT_K).map(k => `<option value="${k}"${+k === +ty.cct ? ' selected' : ''}>${k} K</option>`).join('');
+    const b = ty.bands, name = (LANG === 'et' && ty.et && ty.name === (FIXTURES.find(p => p.id === ty.preset) || {}).name) ? ty.et : ty.name;
+    const outFields = ty.mode === 'lm' ? `<div class="field"><label>${t('lm')} <span class="unit">lm</span></label><input type="number" data-f="lm" min="0" step="100" value="${ty.lm}"></div><div class="field"><label>${t('cct')}</label><select data-f="cct">${cctOpts}</select></div>`
+      : ty.mode === 'eff' ? `<div class="field"><label>${t('effIn')} <span class="unit">µmol/J</span></label><input type="number" data-f="effIn" min="0" step="0.1" value="${ty.effIn}"></div>`
+      : `<div class="field"><label>${t('ppf')} <span class="unit">${t('ppfU')}</span></label><input type="number" data-f="ppf" min="0" step="10" value="${ty.ppf}"></div>`;
+    el.innerHTML = `
+      <div class="head"><span class="swatch" style="background:${TYPE_COLORS[ti % TYPE_COLORS.length]}"></span><h3>${t('lampType')} ${ti + 1}</h3>${S.types.length > 1 ? `<button class="btn small ghost danger" data-act="remove" type="button">${t('remove')}</button>` : ''}</div>
+      <div class="field"><label>${t('preset')}</label><select data-f="preset">${presetOpts}</select></div>
+      <div class="row">
+        <div class="field" style="flex:2 1 140px"><label>${t('name')}</label><input type="text" data-f="name" value="${name.replace(/"/g, '&quot;')}"></div>
+        <div class="field" style="flex:0 1 80px"><label>${t('count')}</label><input type="number" data-f="count" min="0" max="200" step="1" value="${count}"></div>
+      </div>
+      <div class="row geek"><div class="field"><label>${t('outputAs')}</label><select data-f="mode"><option value="ppf"${ty.mode === 'ppf' ? ' selected' : ''}>${t('mPpf')}</option><option value="lm"${ty.mode === 'lm' ? ' selected' : ''}>${t('mLm')}</option><option value="eff"${ty.mode === 'eff' ? ' selected' : ''}>${t('mEff')}</option></select></div></div>
+      <div class="row">${outFields}<div class="field"><label>${t('watts')} <span class="unit">W</span></label><input type="number" data-f="watts" min="0" step="5" value="${ty.watts}"></div></div>
+      <div class="row">
+        <div class="field"><label>${t('beam')} <span class="unit">${t('beamU')}</span></label><input type="number" data-f="beam" min="5" max="180" step="5" value="${ty.beam}" ${ty.ies ? 'disabled' : ''}></div>
+        <div class="field geek"><label>${t('beam90')} <span class="unit">${t('beamU')}</span></label><input type="number" data-f="beam90" min="0" max="180" step="5" value="${ty.beam90 || 0}" placeholder="=" ${ty.ies ? 'disabled' : ''}></div>
+        <div class="field"><label>${t('spectrumL')}</label><select data-f="spec">${specOpts}</select></div>
+      </div>
+      <div class="field"><label>${t('size')} <span class="unit">${t('sizeU')}</span></label><div class="row"><input type="number" data-f="len" min="0.01" step="0.05" value="${ty.len}" aria-label="Lamp length"><input type="number" data-f="wid" min="0.01" step="0.05" value="${ty.wid}" aria-label="Lamp width"></div></div>
+      ${ty.spec === 'custom' ? `<div class="row geek"><div class="field"><label>${t('bB')}</label><input type="number" data-f="bB" min="0" max="100" value="${Math.round(b.B * 100)}"></div><div class="field"><label>${t('bG')}</label><input type="number" data-f="bG" min="0" max="100" value="${Math.round(b.G * 100)}"></div><div class="field"><label>${t('bR')}</label><input type="number" data-f="bR" min="0" max="100" value="${Math.round(b.R * 100)}"></div><div class="field"><label>${t('bFR')}</label><input type="number" data-f="bFR" min="0" max="100" value="${Math.round(b.FR * 100)}"></div></div>` : ''}
+      <div class="row geek"><div class="field"><label>${t('iesL')} · ${ty.ies ? `${t('using')} <b>${ty.ies.name}</b>` : t('noneBeam')}</label><div class="row"><input type="file" data-f="ies" accept=".ies,.ldt,.IES,.LDT">${ty.ies ? `<button class="btn small" data-act="clearies" type="button">${t('clearies')}</button>` : ''}</div></div></div>
+      <p class="hint" data-role="hint">${typeHint(ty)}</p>`;
+    box.appendChild(el);
+  });
+}
+function renderFixtures() {
+  const box = $('#fixtures'); box.innerHTML = '';
+  S.fixtures.forEach((f, i) => {
+    const ty = S.types.find(t => t.id === f.t), ti = Math.max(0, S.types.indexOf(ty)), el = document.createElement('div'); el.className = 'fixrow' + (i === sel ? ' sel' : ''); el.dataset.i = i;
+    el.innerHTML = `<span class="n" style="color:${i === sel ? TYPE_COLORS[ti % TYPE_COLORS.length] : ''}">${i + 1}</span><span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ty ? ty.name : '?'}</span>
+      <input type="number" data-f="x" step="0.05" value="${(+f.x).toFixed(2)}" aria-label="x, m"><input type="number" data-f="y" step="0.05" value="${(+f.y).toFixed(2)}" aria-label="y, m">
+      <input class="geekcell" type="number" data-f="rot" step="15" value="${f.rot || 0}" aria-label="rotation, degrees" title="Rotation °"><input class="geekcell" type="number" data-f="tilt" step="5" min="0" max="60" value="${f.tilt || 0}" aria-label="tilt, degrees" title="Tilt from vertical °"><input class="geekcell" type="number" data-f="tdir" step="90" value="${f.tdir || 0}" aria-label="tilt direction, degrees" title="${t('tdir')}">
+      <button class="btn small ghost danger" data-act="del" type="button" aria-label="Remove lamp ${i + 1}">×</button>`;
+    box.appendChild(el);
+  });
+}
+function autoLayout() {
+  const n = S.fixtures.length; if (!n) return; const W = S.room.w, L = S.room.l;
+  let cols = clamp(Math.round(Math.sqrt(n * W / L)) || 1, 1, n), rows = Math.ceil(n / cols);
+  if (+S.layRows > 0 && +S.layCols > 0) { rows = clamp(Math.round(+S.layRows), 1, 50); cols = clamp(Math.round(+S.layCols), 1, 50); if (rows * cols < n) rows = Math.ceil(n / cols); }
+  let k = 0; for (let r = 0; r < rows; r++) { const inRow = Math.min(cols, n - r * cols); for (let c = 0; c < inRow; c++) { const f = S.fixtures[k++]; f.x = +((c + 0.5) * W / inRow).toFixed(3); f.y = +((r + 0.5) * L / rows).toFixed(3); } }
+}
+function setCount(ty, count) {
+  const have = S.fixtures.filter(f => f.t === ty.id); count = clamp(Math.round(count) || 0, 0, 200);
+  if (count > have.length) for (let i = have.length; i < count; i++) S.fixtures.push({ t: ty.id, x: S.room.w / 2, y: S.room.l / 2, rot: 0, tilt: 0, tdir: 0 });
+  else if (count < have.length) { let rm = have.length - count; S.fixtures = S.fixtures.filter(f => { if (f.t === ty.id && rm > 0) { rm--; return false; } return true; }); }
+  sel = -1; autoLayout();
+}
+function suggestCount() {
+  const ty = S.types[0]; if (!ty || !(+ty.ppf > 0)) return; const pl = plant(), target = (pl.lo + pl.hi) / 2, area = S.room.w * S.room.l;
+  const capture = (0.55 + 0.2 * (S.reflX + S.reflY)) * (+S.mf || 1); let n = clamp(Math.round(target * area / (+ty.ppf * capture)), 1, 200);
+  S.fixtures = S.fixtures.filter(f => f.t === ty.id); setCount(ty, n); recalc();
+  for (let i = 0; i < 4 && ST; i++) { if (ST.avg < pl.lo && n < 200) { n++; setCount(ty, n); recalc(); } else if (ST.avg > pl.hi && n > 1) { n--; setCount(ty, n); recalc(); } else break; }
+  renderTypes(); renderFixtures(); toast(`${n} × ${nm(ty)}`);
+}
+function fitHeight() {
+  const pl = plant(), target = (pl.lo + pl.hi) / 2; let lo = 0.05, hi = 6;
+  const avgAt = (h) => { S.hang = h; const g = computeGrids(Math.max(+S.cell * 3, 4)), m = deriveMaps(g); return stats(g, m).avg; };
+  if (avgAt(lo) < target) { S.hang = 0.1; toast(t('fitLow')); } else if (avgAt(hi) > target) { S.hang = hi; toast(t('fitHigh')); }
+  else { for (let i = 0; i < 22; i++) { const mid = (lo + hi) / 2; if (avgAt(mid) > target) lo = mid; else hi = mid; } S.hang = Math.round((lo + hi) / 2 * 100) / 100; toast(`${t('fitSet')} ${S.hang.toFixed(2)} m`); }
+  $('#hang').value = S.hang; recalc();
+}
+
+function loadExample(which) {
+  const lang = S.lang, geek = S.geek; S = defaultState(); S.lang = lang; S.geek = geek; sel = -1; distCache.clear();
+  if (which === 'shelf') {
+    // One 3.7 × 1.08 m shelf of a continuous rack, as in a typical vertical-farm offer: 5 rows of 150 cm tubes at 35 cm, growing area 370 × 88 cm.
+    S.plant = 'custom'; S.custLo = 250; S.custHi = 400; S.hours = 16; S.room = { w: 3.7, l: 1.08 }; S.wall = 'shelf'; S.reflX = 1; S.reflY = 0; S.images = 2; S.hang = 0.35; S.margin = 10; S.cell = 2; S.project = 'Rack shelf, block of 3.7 m';
+    const tp = mkType(FIXTURES.find(p => p.id === 'triproof')); Object.assign(tp, { name: 'Tri-proof 150 cm, 50 W, 6000 K, 190 lm/W', lm: 9500, watts: 50, len: 1.5, wid: 0.07 }); resolvePPF(tp);
+    const t8 = mkType(FIXTURES.find(p => p.id === 't8')); Object.assign(t8, { name: 'T8 tube 150 cm, 25 W, 6000 K, 170 lm/W, in housing', lm: 4250, cct: 6000, spec: 'w6000', bands: { ...SPECTRA.w6000 }, watts: 25, beam: 150, beam90: 120, len: 1.5, wid: 0.03 }); resolvePPF(t8);
+    const red = mkType(FIXTURES.find(p => p.id === 'custom')); Object.assign(red, { name: '660 nm LED modules on the housing, 23 W (2.5 µmol/J)', mode: 'ppf', ppf: 58, watts: 23, beam: 120, beam90: 0, len: 1.5, wid: 0.03, spec: 'custom', bands: { B: 0, G: 0, R: .98, FR: .02 } });
+    S.types = [tp, t8, red]; S.fixtures = [];
+    for (const x of [0.925, 2.775]) {
+      S.fixtures.push({ t: t8.id, x, y: 0.14, rot: 0, tilt: 0, tdir: 0 }, { t: tp.id, x, y: 0.25, rot: 0, tilt: 10, tdir: 270 }, { t: t8.id, x, y: 0.54, rot: 0, tilt: 0, tdir: 0 }, { t: tp.id, x, y: 0.83, rot: 0, tilt: 10, tdir: 90 }, { t: t8.id, x, y: 0.94, rot: 0, tilt: 0, tdir: 0 });
+      S.fixtures.push({ t: red.id, x, y: 0.14, rot: 0, tilt: 0, tdir: 0 }, { t: red.id, x, y: 0.54, rot: 0, tilt: 0, tdir: 0 }, { t: red.id, x, y: 0.94, rot: 0, tilt: 0, tdir: 0 });
+    }
+  }
+  bindStatic(); recalc(); toast(t('exampleLoaded'));
+}
+
+/* ---------------- language ---------------- */
+function applyLang() {
+  document.documentElement.lang = LANG; $('#langEn').setAttribute('aria-pressed', LANG === 'en'); $('#langEt').setAttribute('aria-pressed', LANG === 'et');
+  $$('[data-i18n]').forEach(el => { const k = el.dataset.i18n; const v = I18N[LANG][k]; if (v !== undefined) el.textContent = v; else if (LANG === 'en' && el.dataset.en) el.textContent = el.dataset.en; });
+  if (LANG === 'et' && !applyLang.saved) { applyLang.saved = true; $$('[data-i18n]').forEach(el => { if (!el.dataset.en) el.dataset.en = el.textContent; }); $$('[data-i18n]').forEach(el => { const v = I18N.et[el.dataset.i18n]; if (v !== undefined) el.textContent = v; }); }
+  fillSelect($('#plant'), PLANTS, S.plant, 'id', nm); fillSelect($('#wall'), WALLS, S.wall, 'id', (w) => LANG === 'et' ? t(w.k) : w.name); fillSelect($('#luxSrc'), LUX.map((l, i) => ({ id: i, name: LANG === 'et' && l.et ? l.et : l.n })), $('#luxSrc').value || 4);
+  renderTypes(); renderFixtures(); plantInfo(); luxUpdate(); if (ST) { render(); updateResults(); }
+}
+function plantInfo() { const pl = plant(); $('#plantInfo').textContent = t('plantInfo').replace('{lo}', pl.lo).replace('{hi}', pl.hi).replace('{a}', pl.dli[0]).replace('{b}', pl.dli[1]).replace('{h}', S.hours) + ' ' + (pl.note ? t(pl.note) : ''); }
+
+/* ---------------- events ---------------- */
+function bindStatic() {
+  const set = (id, v) => { const e = $('#' + id); if (e) e.value = v; };
+  set('hours', S.hours); set('custLo', S.custLo); set('custHi', S.custHi); set('roomW', S.room.w); set('roomL', S.room.l); set('reflX', S.reflX); set('reflY', S.reflY); set('images', S.images); set('hang', S.hang); set('margin', S.margin || 0); set('layRows', S.layRows || ''); set('layCols', S.layCols || ''); set('example', '');
+  set('cell', S.cell); set('subN', S.subN); set('ambient', S.ambient); set('price', S.price); set('currency', S.currency); set('project', S.project || ''); set('tiers', S.tiers || 1); set('mf', S.mf == null ? 0.9 : S.mf);
+  $('#geek').checked = !!S.geek; document.body.classList.toggle('geekmode', !!S.geek); $('#numbers').checked = !!S.numbers; $('#mccree').checked = !!S.mccree;
+  $('#reflXVal').textContent = Math.round(S.reflX * 100) + ' %'; $('#reflYVal').textContent = Math.round(S.reflY * 100) + ' %'; $('#mfVal').textContent = fmt(S.mf, 2); $('#custWrap').hidden = S.plant !== 'custom';
+  $$('#views .tab').forEach(b => b.setAttribute('aria-selected', b.dataset.view === S.view ? 'true' : 'false'));
+  LANG = S.lang === 'et' ? 'et' : 'en'; applyLang();
+}
+function luxUpdate() { const f = LUX[+$('#luxSrc').value || 0].f; $('#luxOut').textContent = fmt((+$('#luxIn').value || 0) / f); }
+function onInput(e) {
+  const el = e.target, id = el.id, num = (v, d) => { const x = parseFloat(v); return isFinite(x) ? x : d; };
+  if (id === 'plant') { S.plant = el.value; const pl = PLANTS.find(p => p.id === S.plant); if (pl && pl.id !== 'custom') { S.hours = pl.hours; $('#hours').value = pl.hours; } $('#custWrap').hidden = S.plant !== 'custom'; }
+  else if (id === 'hours') S.hours = clamp(num(el.value, 12), 1, 24);
+  else if (id === 'custLo') S.custLo = num(el.value, 300); else if (id === 'custHi') S.custHi = num(el.value, 600);
+  else if (id === 'roomW') { S.room.w = clamp(num(el.value, 1), 0.2, 30); autoLayout(); renderFixtures(); }
+  else if (id === 'roomL') { S.room.l = clamp(num(el.value, 1), 0.2, 30); autoLayout(); renderFixtures(); }
+  else if (id === 'wall') { S.wall = el.value; const w = WALLS.find(w => w.id === S.wall); S.reflX = w.rx; S.reflY = w.ry; $('#reflX').value = w.rx; $('#reflY').value = w.ry; $('#reflXVal').textContent = Math.round(w.rx * 100) + ' %'; $('#reflYVal').textContent = Math.round(w.ry * 100) + ' %'; }
+  else if (id === 'reflX') { S.reflX = clamp(num(el.value, 0.7), 0, 1); $('#reflXVal').textContent = Math.round(S.reflX * 100) + ' %'; }
+  else if (id === 'reflY') { S.reflY = clamp(num(el.value, 0.7), 0, 1); $('#reflYVal').textContent = Math.round(S.reflY * 100) + ' %'; }
+  else if (id === 'margin') S.margin = clamp(num(el.value, 0), 0, 100);
+  else if (id === 'layRows' || id === 'layCols') { S[id] = clamp(Math.round(num(el.value, 0)), 0, 50); autoLayout(); renderFixtures(); }
+  else if (id === 'example') { if (el.value) { loadExample(el.value); } return; }
+  else if (id === 'mf') { S.mf = clamp(num(el.value, 0.9), 0.5, 1); $('#mfVal').textContent = fmt(S.mf, 2); }
+  else if (id === 'tiers') { S.tiers = clamp(Math.round(num(el.value, 1)), 1, 50); updateResults(); persist(); return; }
+  else if (id === 'project') { S.project = el.value; persist(); return; }
+  else if (id === 'images') S.images = +el.value; else if (id === 'hang') S.hang = clamp(num(el.value, 0.5), 0.05, 10);
+  else if (id === 'cell') { S.cell = +el.value; computeGrids.warned = false; } else if (id === 'subN') S.subN = +el.value; else if (id === 'ambient') S.ambient = clamp(num(el.value, 0), 0, 80);
+  else if (id === 'price') { S.price = Math.max(0, num(el.value, 0.2)); updateResults(); persist(); return; } else if (id === 'currency') { S.currency = el.value; updateResults(); persist(); return; }
+  else if (id === 'geek') { S.geek = el.checked; document.body.classList.toggle('geekmode', S.geek); render(); persist(); return; }
+  else if (id === 'numbers') { S.numbers = el.checked; render(); persist(); return; } else if (id === 'mccree') { S.mccree = el.checked; updateResults(); persist(); return; }
+  else if (id === 'luxIn' || id === 'luxSrc') { luxUpdate(); return; }
+  else return;
+  plantInfo(); recalc();
+}
+function onTypeInput(e) {
+  const card = e.target.closest('.type'); if (!card) return; const ty = S.types.find(t => t.id === card.dataset.id); if (!ty) return; const f = e.target.dataset.f, v = e.target.value;
+  if (f === 'preset') { const p = FIXTURES.find(p => p.id === v); if (p) { const fresh = mkType(p); uid--; Object.assign(ty, { ...fresh, id: ty.id }); renderTypes(); renderFixtures(); } }
+  else if (f === 'name') ty.name = v; else if (f === 'count') { setCount(ty, +v); renderFixtures(); }
+  else if (f === 'mode') { ty.mode = v; resolvePPF(ty); renderTypes(); }
+  else if (f === 'cct') { ty.cct = +v; resolvePPF(ty); if (CCT_SPEC[ty.cct]) { ty.spec = CCT_SPEC[ty.cct]; ty.bands = { ...SPECTRA[ty.spec] }; } renderTypes(); }
+  else if (f === 'spec') { ty.spec = v; if (v !== 'custom') ty.bands = { ...SPECTRA[v] }; renderTypes(); }
+  else if (f && f[0] === 'b' && f.length <= 3 && f !== 'beam') { const key = f.slice(1); ty.bands[key] = clamp(+v, 0, 100) / 100; const s = ty.bands.B + ty.bands.G + ty.bands.R + ty.bands.FR || 1; for (const k of ['B', 'G', 'R', 'FR']) ty.bands[k] /= s; }
+  else if (f === 'ies') { const file = e.target.files && e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { try { const tab = /\.ldt$/i.test(file.name) ? parseLDT(rd.result) : parseIES(rd.result); tab.name = file.name; tableLUT(tab); ty.ies = tab; toast(tab.warn || `${t('loaded')} ${file.name}`); renderTypes(); recalc(); } catch (err) { toast(t('cantRead') + ': ' + err.message); } }; rd.readAsText(file); return; }
+  else if (f in ty) { const x = parseFloat(v); if (isFinite(x)) { ty[f] = x; if (f === 'lm' || f === 'effIn' || f === 'watts') resolvePPF(ty); } }
+  const hint = card.querySelector('[data-role="hint"]'); if (hint && f !== 'count') hint.textContent = typeHint(ty);
+  recalc();
+}
+function onTypeClick(e) {
+  const btn = e.target.closest('button[data-act]'); if (!btn) return; const card = e.target.closest('.type'); const ty = S.types.find(t => t.id === card.dataset.id);
+  if (btn.dataset.act === 'remove') { S.types = S.types.filter(x => x !== ty); S.fixtures = S.fixtures.filter(f => f.t !== ty.id); sel = -1; autoLayout(); }
+  else if (btn.dataset.act === 'clearies') ty.ies = null;
+  renderTypes(); renderFixtures(); recalc();
+}
+function onFixInput(e) { const row = e.target.closest('.fixrow'); if (!row) return; const f = S.fixtures[+row.dataset.i]; if (!f) return; const k = e.target.dataset.f, x = parseFloat(e.target.value); if (!isFinite(x)) return;
+  if (k === 'x') f.x = clamp(x, 0, S.room.w); else if (k === 'y') f.y = clamp(x, 0, S.room.l); else if (k === 'rot') f.rot = x; else if (k === 'tilt') f.tilt = clamp(x, 0, 60); else if (k === 'tdir') f.tdir = x; recalc(); }
+function onFixClick(e) { const btn = e.target.closest('button[data-act="del"]'); const row = e.target.closest('.fixrow'); if (!row) return; const i = +row.dataset.i;
+  if (btn) { S.fixtures.splice(i, 1); sel = -1; renderTypes(); renderFixtures(); recalc(); } else { sel = i; renderFixtures(); render(); } }
+function canvasToRoom(ev) { const r = stage.getBoundingClientRect(), g = render.g, dpr = g.dpr; const X = (ev.clientX - r.left) * dpr, Y = (ev.clientY - r.top) * dpr; return { x: (X - g.pad) / g.ppm, y: (g.pad + g.mapH - Y) / g.ppm }; }
+function hitFixture(p) {
+  for (let i = S.fixtures.length - 1; i >= 0; i--) { const f = S.fixtures[i], ty = S.types.find(t => t.id === f.t); if (!ty) continue; const a = -(f.rot || 0) * DEG, dx = p.x - f.x, dy = p.y - f.y;
+    const u = dx * Math.cos(a) - dy * Math.sin(a), v = dx * Math.sin(a) + dy * Math.cos(a), padM = 0.06 * Math.max(1, S.room.w / 2); if (Math.abs(u) <= Math.max(0.05, ty.len) / 2 + padM && Math.abs(v) <= Math.max(0.03, ty.wid) / 2 + padM) return i; }
+  return -1;
+}
+function bindEvents() {
+  document.addEventListener('input', (e) => { if (e.target.closest('#types')) onTypeInput(e); else if (e.target.closest('#fixtures')) onFixInput(e); else onInput(e); });
+  document.addEventListener('change', (e) => { if (e.target.dataset && e.target.dataset.f === 'ies') onTypeInput(e); });
+  $('#types').addEventListener('click', onTypeClick); $('#fixtures').addEventListener('click', onFixClick);
+  $('#btnAddType').addEventListener('click', () => { const p = FIXTURES[S.types.length % 2 ? 0 : 11]; const ty = mkType(p); S.types.push(ty); S.fixtures.push({ t: ty.id, x: S.room.w / 2, y: S.room.l / 2, rot: 0, tilt: 0, tdir: 0 }); autoLayout(); renderTypes(); renderFixtures(); recalc(); });
+  $('#btnAuto').addEventListener('click', () => { autoLayout(); renderFixtures(); recalc(); }); $('#btnSuggest').addEventListener('click', suggestCount); $('#btnFit').addEventListener('click', fitHeight);
+  $('#views').addEventListener('click', (e) => { const b = e.target.closest('.tab'); if (!b) return; S.view = b.dataset.view; $$('#views .tab').forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false')); render(); persist(); });
+  $('#btnExample').addEventListener('click', () => loadExample('tent'));
+  $('#langEn').addEventListener('click', () => { S.lang = 'en'; LANG = 'en'; applyLang(); persist(); }); $('#langEt').addEventListener('click', () => { S.lang = 'et'; LANG = 'et'; applyLang(); persist(); });
+  $('#themeToggle').addEventListener('click', () => { const r = document.documentElement, cur = r.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); const nx = cur === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', nx); try { localStorage.setItem('growlight.theme', nx); } catch (e) {} render(); });
+  $('#palettes').addEventListener('click', (e) => { const b = e.target.closest('button[data-pal]'); if (b) applyPalette(b.dataset.pal, true, true); });
+  $('#btnSave').addEventListener('click', () => download((S.project ? S.project.replace(/[^\w-]+/g, '_') + '-' : '') + 'growlight-plan.json', JSON.stringify(serialize(), null, 1), 'application/json'));
+  $('#fileLoad').addEventListener('change', (e) => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => { try { load(JSON.parse(rd.result)); toast(t('planLoaded')); } catch (err) { toast(t('notPlan')); } }; rd.readAsText(file); e.target.value = ''; });
+  $('#btnPng').addEventListener('click', exportPNG); $('#btnCsv').addEventListener('click', exportCSV);
+  stage.addEventListener('pointerdown', (e) => { if (!render.g) return; const p = canvasToRoom(e), i = hitFixture(p); sel = i; renderFixtures(); if (i >= 0) { dragging = { i, ox: p.x - S.fixtures[i].x, oy: p.y - S.fixtures[i].y }; stage.setPointerCapture(e.pointerId); stage.classList.add('dragging'); } render(); });
+  stage.addEventListener('pointermove', (e) => { if (!dragging) return; const p = canvasToRoom(e), f = S.fixtures[dragging.i]; f.x = clamp(Math.round((p.x - dragging.ox) * 100) / 100, 0, S.room.w); f.y = clamp(Math.round((p.y - dragging.oy) * 100) / 100, 0, S.room.l); recalc(false); });
+  const endDrag = () => { if (!dragging) return; dragging = null; stage.classList.remove('dragging'); renderFixtures(); recalc(true); };
+  stage.addEventListener('pointerup', endDrag); stage.addEventListener('pointercancel', endDrag);
+  document.addEventListener('keydown', (e) => { if ((e.key === 'Delete' || e.key === 'Backspace') && sel >= 0 && !/input|select|textarea/i.test(document.activeElement.tagName)) { S.fixtures.splice(sel, 1); sel = -1; renderTypes(); renderFixtures(); recalc(); } });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => render(), 120); });
+}
+
+/* ---------------- persistence and export ---------------- */
+function serialize() { return JSON.parse(JSON.stringify({ ...S, types: S.types.map(ty => ({ ...ty, ies: ty.ies ? { name: ty.ies.name, V: ty.ies.V, H: ty.ies.H, C: ty.ies.C, mode: ty.ies.mode } : null })) })); }
+function normalize(data) {
+  S = { ...defaultState(), ...data }; S.room = { ...defaultState().room, ...(data.room || {}) };
+  if (S.reflX == null) { const r = data.refl != null ? +data.refl : 0.9; S.reflX = r; S.reflY = r; } if (!S.cell) S.cell = 2;
+  S.types.forEach(ty => { if (!ty.bands) ty.bands = { ...SPECTRA[ty.spec] || SPECTRA.custom }; if (!ty.mode) ty.mode = 'ppf'; if (ty.beam90 == null) ty.beam90 = 0; const n = parseInt(String(ty.id).slice(1)); if (n >= uid) uid = n + 1; });
+  S.fixtures = (S.fixtures || []).filter(f => S.types.some(t => t.id === f.t)); sel = -1;
+}
+function load(data) { if (!data || !data.types) throw new Error('bad'); normalize(data); bindStatic(); recalc(); }
+function persist() { try { localStorage.setItem('growlight.v3', JSON.stringify(serialize())); } catch (e) {} }
+function download(name, content, type) { try { const blob = content instanceof Blob ? content : new Blob([content], { type }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast(`${t('saved')} ${name}`); } catch (e) { toast(t('dlBlocked')); } }
+function exportCSV() { if (!G) return; const rows = ['x_m,y_m,ppfd,epar,dli,blue_pct,rfr']; for (let j = 0; j < G.ny; j++) for (let i = 0; i < G.nx; i++) { const k = j * G.nx + i; rows.push(`${((i + 0.5) * G.dx).toFixed(3)},${((j + 0.5) * G.dy).toFixed(3)},${M.ppfd[k].toFixed(1)},${M.epar[k].toFixed(1)},${(M.ppfd[k] * S.hours * 0.0036 + +S.ambient).toFixed(2)},${(M.epar[k] > 0 ? 100 * M.B[k] / M.epar[k] : 0).toFixed(1)},${(M.FR[k] > 0 ? M.R[k] / M.FR[k] : 0).toFixed(2)}`); } download('growlight-ppfd-grid.csv', rows.join('\n'), 'text/csv'); }
+function exportPNG() {
+  if (!G) return; const s = ST, pl = s.pl, W = 1400, pad = 40, mapDestW = W - 2 * pad, mapDestH = Math.round(mapDestW * stage.height / stage.width);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = mapDestH + 320; const c = cv.getContext('2d');
+  const bgC = cssVar('--bg'), fgC = cssVar('--fg'), muC = cssVar('--muted');
+  c.fillStyle = bgC; c.fillRect(0, 0, cv.width, cv.height); c.fillStyle = fgC; c.font = '700 28px Sora, system-ui, sans-serif'; c.fillText(S.project ? `${S.project}` : 'Grow Light Planner', pad, 44);
+  c.fillStyle = muC; c.font = '16px Figtree, system-ui, sans-serif'; c.fillText(`${nm(pl)} · ${fmt(S.room.w, 2)} × ${fmt(S.room.l, 2)} m · ${fmt(S.hang, 2)} m · ${S.fixtures.length} × · ${new Date().toLocaleDateString()}`, pad, 72);
+  c.drawImage(stage, pad, 90, mapDestW, mapDestH);
+  const y = mapDestH + 140;
+  const items = [[t('avgU'), fmt(s.avg)], [t('minmax'), `${fmt(s.min)} / ${fmt(s.max)}`], [t('unifU'), fmt(s.unif, 2)], [t('dliU'), `${fmt(s.dli, 1)} @ ${S.hours} h`], [t('covU'), `${fmt(s.inr * 100)} % (${pl.lo}–${pl.hi})`], [t('lampPower'), `${fmt(s.watts)} W · ${fmt(s.eff, 2)} µmol/J`], ['B·G·R·FR', `${fmt(s.fB * 100)}·${fmt(s.fG * 100)}·${fmt(s.fR * 100)}·${fmt(s.fFR * 100)} %`], [t('cost'), `${S.currency} ${fmt(s.kwh * S.price, 2)} · ${S.currency} ${fmt(s.kwh * S.price * 30)}`]];
+  items.forEach(([k, v], i) => { const X = pad + (i % 4) * 330, Y = y + Math.floor(i / 4) * 64; c.fillStyle = muC; c.font = '14px Figtree, system-ui, sans-serif'; c.fillText(k, X, Y); c.fillStyle = fgC; c.font = '700 22px Sora, system-ui, sans-serif'; c.fillText(v, X, Y + 28); });
+  c.fillStyle = muC; c.font = '12px Figtree, system-ui, sans-serif'; c.fillText(S.types.map(ty => `${S.fixtures.filter(f => f.t === ty.id).length} × ${ty.name} (${fmt(ty.ppf)} µmol/s, ${ty.watts} W)`).join(' · ') + ` · MF ${fmt(S.mf, 2)}`, pad, cv.height - 22);
+  cv.toBlob((b) => download('growlight-map.png', b, 'image/png'), 'image/png');
+}
+
+/* ---------------- boot ---------------- */
+function init() {
+  try { const pa = localStorage.getItem('growlight.palette'); if (pa) applyPalette(pa, false, false); const th = localStorage.getItem('growlight.theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}
+  bindStatic(); bindEvents(); recalc();
+  if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => serialize());
+}
+function start(data) {
+  let loaded = false;
+  if (data && data.types) { try { normalize(data); loaded = true; } catch (e) {} }
+  if (!loaded) { try { const raw = localStorage.getItem('growlight.v3'); if (raw) { const d = JSON.parse(raw); if (d && d.types && d.fixtures) { normalize(d); loaded = true; } } } catch (e) {} }
+  if (!loaded) { try { if ((navigator.language || '').toLowerCase().startsWith('et')) S.lang = 'et'; } catch (e) {} }
+  init();
+}
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || null);
+})();
+</script>
+
+</body>
+</html>
